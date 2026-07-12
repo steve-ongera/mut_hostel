@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: Arial, sans-serif; color:#222; max-width:600px; margin:0 auto;">
+  <div style="background:#9e0505; padding:20px; text-align:center;">
+    <h2 style="color:#fff; margin:0;">Murang'a University of Technology</h2>
+    <p style="color:#fff; margin:4px 0 0;">Hostel Booking Portal</p>
+  </div>
+
+  <div style="padding:24px;">
+    <p>Dear {{ booking.full_name }},</p>
+    <p>
+      Your hostel booking payment has been received successfully. Below are your booking details.
+      Your official receipt, including a scannable QR code, is attached to this email as a PDF.
+    </p>
+
+    <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+      <tr><td style="padding:6px 0; font-weight:bold;">Booking Reference</td><td>{{ booking.booking_reference }}</td></tr>
+      <tr><td style="padding:6px 0; font-weight:bold;">Registration No.</td><td>{{ booking.registration_number }}</td></tr>
+      <tr><td style="padding:6px 0; font-weight:bold;">Hostel</td><td>{{ booking.hostel.name }}</td></tr>
+      <tr><td style="padding:6px 0; font-weight:bold;">Room / Bed</td><td>{{ booking.room.room_number }} / {{ booking.bed.bed_number }}</td></tr>
+      <tr><td style="padding:6px 0; font-weight:bold;">Amount Paid</td><td>KES {{ booking.amount }}</td></tr>
+      <tr><td style="padding:6px 0; font-weight:bold;">Status</td><td>{{ booking.get_status_display }}</td></tr>
+    </table>
+
+    <p>Please keep this receipt safe. You may be asked to present it (or the QR code) when reporting to your hostel.</p>
+    <p>If you have any questions, contact the Directorate of Catering and Accommodation Services.</p>
+
+    <p style="margin-top:24px;">Regards,<br>MUT Hostel Booking System</p>
+  </div>
+</body>
+</html>
