@@ -11,7 +11,7 @@ export default function HomePage() {
     let isMounted = true;
     getHostels()
       .then((data) => {
-        if (isMounted) setHostels(data);
+        if (isMounted) setHostels(Array.isArray(data) ? data : []);
       })
       .catch((err) => {
         if (isMounted) setError(extractErrorMessages(err).join(" "));

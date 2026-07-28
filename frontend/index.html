@@ -12,6 +12,10 @@
     <!-- SITE TITLE -->
     <title>Muranga University Hostel Booking</title>
 
+    <!-- Bootstrap CSS (grid system: .container, .row, .col-lg-*, .d-flex, .d-none, etc.
+         This MUST load before main.css so the theme's custom rules can override it. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" />
+
     <!-- Google Font -->
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
@@ -35,7 +39,7 @@
     <!-- Animate CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
-    <!-- Theme stylesheet (ported from the Eduleb template) -->
+    <!-- Theme stylesheet (ported from the Eduleb template) - loads last so it can override Bootstrap -->
     <link rel="stylesheet" href="/src/styles/main.css" />
   </head>
 

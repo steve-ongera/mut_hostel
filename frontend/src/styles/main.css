@@ -1859,7 +1859,7 @@ margin-right: 5px;
 * ----------------------------------------------------------------------------------------
 */
 .testi_area {
-	background: url(../img/bg/shape-1.png) no-repeat;
+	background: url(/assets/img/bg/shape-1.png) no-repeat;
 	background-size: cover;
 }
 .testimonial {
@@ -2771,7 +2771,7 @@ font-weight: 700;
 .section-top {
 	padding-top:150px;
 	position: relative;
-	background: url(../img/bg/section-top.jpg);
+	background: url(/assets/img/bg/section-top.jpg);
 	background-size: cover;
 	background-position: center;
 	padding-bottom: 90px;
@@ -2796,5 +2796,83 @@ font-weight: 700;
 /*
 * ----------------------------------------------------------------------------------------
 * 18.END SECTION TOP DESIGN
+* ----------------------------------------------------------------------------------------
+*/
+
+/*
+* ----------------------------------------------------------------------------------------
+* 19.START MOBILE MENU (ported equivalent of jquery-simple-mobilemenu.css,
+* which was not included in the React port)
+* ----------------------------------------------------------------------------------------
+*/
+#sm_menu_ham {
+	display: none;
+	background: none;
+	border: none;
+	font-size: 26px;
+	color: #0b104a;
+	cursor: pointer;
+	z-index: 1000;
+}
+.mobile_menu {
+	display: none;
+	list-style: none;
+	position: fixed;
+	top: 0;
+	right: -300px;
+	width: 280px;
+	max-width: 80%;
+	height: 100%;
+	margin: 0;
+	padding: 80px 25px 30px;
+	background: #0b104a;
+	z-index: 9999;
+	overflow-y: auto;
+	box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+	transition: right 0.3s ease;
+}
+.mobile_menu.show {
+	right: 0;
+}
+.mobile_menu li {
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+.mobile_menu li a {
+	display: block;
+	color: #fff;
+	padding: 12px 0;
+	font-size: 15px;
+	font-weight: 600;
+	text-transform: uppercase;
+	border-bottom: 1px solid rgba(255,255,255,0.08);
+	transition: color 0.2s ease;
+}
+.mobile_menu li a:hover {
+	color: #525fe1;
+}
+.mobile_menu .sub-menu {
+	padding-left: 15px;
+	margin-top: 5px;
+}
+.mobile_menu .sub-menu li a {
+	font-size: 13px;
+	text-transform: none;
+	font-weight: 500;
+	border-bottom: none;
+	padding: 8px 0;
+}
+@media only screen and (max-width: 991px) {
+	#sm_menu_ham {
+		display: block;
+	}
+	.mobile_menu {
+		display: block;
+	}
+}
+/*
+* ----------------------------------------------------------------------------------------
+* 19.END MOBILE MENU
 * ----------------------------------------------------------------------------------------
 */

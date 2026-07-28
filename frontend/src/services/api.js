@@ -22,6 +22,17 @@ const api = axios.create({
 });
 
 // ---------------------------------------------------------------------
+// Helper: normalizes DRF list responses into a plain array, whether the
+// endpoint returns a raw list ([...]) or a paginated object
+// ({ count, next, previous, results: [...] }).
+// ---------------------------------------------------------------------
+const normalizeList = (data) => {
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.results)) return data.results;
+  return [];
+};
+
+// ---------------------------------------------------------------------
 // Hostels & Rooms
 // GET  /api/hostels/?category=boys|girls
 // GET  /api/hostels/<id>/
@@ -30,7 +41,7 @@ const api = axios.create({
 export const getHostels = (category) =>
   api
     .get("/hostels/", { params: category ? { category } : {} })
-    .then((res) => res.data);
+    .then((res) => normalizeList(res.data));
 
 export const getHostelDetail = (hostelId) =>
   api.get(`/hostels/${hostelId}/`).then((res) => res.data);
