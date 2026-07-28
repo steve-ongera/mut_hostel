@@ -52,11 +52,9 @@ export default function Navbar() {
           {/* END Col */}
 
           <div className="col-20 d-none d-xl-block text-end align-self-center">
-            <Link to="/bookings/lookup" className="header-btn">
-              Track Booking
-            </Link>
+           
             <Link to="/hostels" className="btn_one">
-              Book Now
+              <i className="bi bi-calendar-check me-1"></i>Book Now
             </Link>
           </div>
           {/* END Col */}

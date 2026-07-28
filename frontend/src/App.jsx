@@ -1,4 +1,3 @@
-// App.jsx
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
 
@@ -15,7 +14,7 @@ import ReceiptPage from "./pages/ReceiptPage.jsx";
 
 function ComingSoon({ title }) {
   return (
-    <div className="container section" style={{ textAlign: "center" }}>
+    <div className="container section" style={{ textAlign: "center", padding: "80px 0" }}>
       <h2 className="section-title">{title}</h2>
       <p className="section-subtitle" style={{ margin: "0 auto" }}>
         This page is under construction. We're building it next.
@@ -43,8 +42,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<About />} />
-          <Route path="/hostels/boys" element={<HostelsListPage />} />
-          <Route path="/hostels/girls" element={<HostelsListPage />} />
+          <Route path="/hostels" element={<HostelsListPage />} />
           <Route path="/hostels/:hostelId" element={<HostelDetailPage />} />
           <Route path="/booking/:bedId" element={<BookingFormPage />} />
           <Route path="/booking/:id/pay" element={<PaymentPage />} />
