@@ -1,150 +1,144 @@
-// src/components/Footer.jsx
+import React from "react";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer className="footer">
-      <div className="container">
-        <div className="grid grid-cols-4 gap-5">
-          {/* Brand & About */}
-          <div>
-            <div className="footer-brand">
-              <span className="brand-icon">
-                <i className="bi bi-building" />
-              </span>
-              <span className="brand-text">MUT Hostel Portal</span>
+    <>
+      {/* START FOOTER */}
+      <div className="footer section-padding">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-3 col-sm-6 col-xs-12">
+              <div className="single_footer">
+                <Link to="/">
+                  <img src="/assets/img/logo.png" alt="Muranga University Hostel Booking" />
+                </Link>
+                <p>
+                  The official online platform for booking, paying for and managing student
+                  hostel accommodation at Muranga University.
+                </p>
+                <div className="social_profile">
+                  <ul>
+                    <li>
+                      <a className="f_facebook" href="#">
+                        <i className="fa-brands fa-facebook-f"></i>
+                      </a>
+                    </li>
+                    <li>
+                      <a className="f_twitter" href="#">
+                        <i className="fa-solid fa-x"></i>
+                      </a>
+                    </li>
+                    <li>
+                      <a className="f_instagram" href="#">
+                        <i className="fa-brands fa-instagram"></i>
+                      </a>
+                    </li>
+                    <li>
+                      <a className="f_linkedin" href="#">
+                        <i className="fa-brands fa-linkedin-in"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
-            <p style={{ fontSize: "0.95rem", marginBottom: "1rem" }}>
-              Secure your accommodation at Murang'a University with ease. 
-              Book your bed online, pay via M-Pesa, and get instant confirmation.
-            </p>
-            <div className="footer-social">
-              <a 
-                href="https://facebook.com/murangaauniversity" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-              >
-                <i className="bi bi-facebook" />
-              </a>
-              <a 
-                href="https://twitter.com/murangaauni" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                aria-label="Twitter"
-              >
-                <i className="bi bi-twitter-x" />
-              </a>
-              <a 
-                href="https://instagram.com/murangaauniversity" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-              >
-                <i className="bi bi-instagram" />
-              </a>
-              <a 
-                href="https://youtube.com/murangaauniversity" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-              >
-                <i className="bi bi-youtube" />
-              </a>
+            {/* END COL */}
+
+            <div className="col-lg-2 col-sm-6 col-xs-12">
+              <div className="single_footer">
+                <h4>Quick Links</h4>
+                <ul>
+                  <li>
+                    <Link to="/about">About the Hostels</Link>
+                  </li>
+                  <li>
+                    <Link to="/hostels">Book a Bed</Link>
+                  </li>
+                  <li>
+                    <Link to="/bookings/lookup">Track a Booking</Link>
+                  </li>
+                  <li>
+                    <a href="#faq">Frequently Asked Questions</a>
+                  </li>
+                  <li>
+                    <Link to="/contact">Contact Us</Link>
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
+            {/* END COL */}
 
-          {/* Quick Links */}
-          <div>
-            <h4>Quick Links</h4>
-            <ul className="footer-links">
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <Link to="/hostels/boys">Boys Hostels</Link>
-              </li>
-              <li>
-                <Link to="/hostels/girls">Girls Hostels</Link>
-              </li>
-              <li>
-                <Link to="/about">About</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h4>Support</h4>
-            <ul className="footer-links">
-              <li>
-                <a href="mailto:hostels@mut.ac.ke">
-                  <i className="bi bi-envelope" /> hostels@mut.ac.ke
-                </a>
-              </li>
-              <li>
-                <a href="tel:+254712345678">
-                  <i className="bi bi-telephone" /> +254 712 345 678
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <i className="bi bi-whatsapp" /> +254 712 345 678
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <i className="bi bi-clock" /> 24/7 Support
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Location */}
-          <div>
-            <h4>Location</h4>
-            <ul className="footer-links">
-              <li>
-                <i className="bi bi-geo-alt" /> Murang'a University
-              </li>
-              <li>
-                <i className="bi bi-pin-map" /> Murang'a Town, Kenya
-              </li>
-              <li>
-                <i className="bi bi-phone" /> +254 712 345 678
-              </li>
-              <li>
-                <i className="bi bi-globe" /> www.mut.ac.ke
-              </li>
-            </ul>
-            <div style={{ marginTop: "1rem" }}>
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127650.123456789!2d36.0!3d-1.0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMcKwMDAnMDAuMCJTIDM2wrAwMCcwMC4wIkU!5e0!3m2!1sen!2ske!4v1234567890"
-                width="100%"
-                height="120"
-                style={{ border: 0, borderRadius: "8px" }}
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Murang'a University Location"
-              />
+            <div className="col-lg-2 col-sm-6 col-xs-12">
+              <div className="single_footer">
+                <h4>Hostels</h4>
+                <ul>
+                  <li>
+                    <Link to="/hostels?category=boys">Boys Hostels</Link>
+                  </li>
+                  <li>
+                    <Link to="/hostels?category=girls">Girls Hostels</Link>
+                  </li>
+                  <li>
+                    <a href="#">Bed Availability</a>
+                  </li>
+                  <li>
+                    <a href="#">Hostel Fees</a>
+                  </li>
+                  <li>
+                    <a href="#">M-Pesa Payment Guide</a>
+                  </li>
+                </ul>
+              </div>
             </div>
+            {/* END COL */}
+
+            <div className="col-lg-3 col-sm-6 col-xs-12">
+              <div className="single_footer">
+                <h4>Contact Info</h4>
+                <div className="sf_contact">
+                  <span className="ti-map"></span>
+                  <p>Muranga University of Technology, Muranga, Kenya</p>
+                </div>
+                <div className="sf_contact">
+                  <span className="ti-mobile"></span>
+                  <p>+254 700 000 000</p>
+                </div>
+                <div className="sf_contact">
+                  <span className="ti-mobile"></span>
+                  <p>
+                    <a href="tel:+254700000000">Chat with the Hostel Office</a>
+                  </p>
+                </div>
+                <div className="sf_contact">
+                  <span className="ti-email"></span>
+                  <p>hostels@mut.ac.ke</p>
+                </div>
+              </div>
+            </div>
+            {/* END COL */}
+
+            <div className="col-lg-2 col-sm-6 col-xs-12">
+              <div className="single_footer">
+                <h4>Payments</h4>
+                <p>All bookings are secured instantly via M-Pesa. No cash is handled on campus.</p>
+              </div>
+            </div>
+            {/* END COL */}
           </div>
+          {/* END ROW */}
         </div>
+        {/* END CONTAINER */}
+      </div>
+      {/* END FOOTER */}
 
-        {/* Footer Bottom */}
-        <div className="footer-bottom">
-          <p>
-            &copy; {currentYear} Murang'a University. All rights reserved.
-          </p>
-          <p>
-            <Link to="/privacy" style={{ marginRight: "1rem" }}>Privacy Policy</Link>
-            <Link to="/terms">Terms of Service</Link>
-          </p>
+      {/* START FOOTER COPYRIGHT */}
+      <div className="foot_copy">
+        <div className="footer_copyright">
+          <p>&copy; {new Date().getFullYear()} Muranga University Hostel Booking. All Rights Reserved.</p>
         </div>
       </div>
-    </footer>
+      {/* END FOOTER COPYRIGHT */}
+    </>
   );
 }

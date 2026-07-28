@@ -1,622 +1,834 @@
-// src/pages/HomePage.jsx
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { getHostels } from "../services/api";
+import { getHostels, resolveMediaUrl, extractErrorMessages } from "../services/api";
 
 export default function HomePage() {
-  const [stats, setStats] = useState({
-    totalBeds: 0,
-    availableBeds: 0,
-    hostels: 0,
-  });
+  const [hostels, setHostels] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  // Hero Carousel Images (HTTP links for SEO)
-  const heroSlides = [
-    {
-      id: 1,
-      image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200&h=600&fit=crop",
-      title: "Modern Hostel Accommodation",
-      subtitle: "Comfortable rooms designed for student success",
-      cta: "View Hostels",
-      link: "/hostels/boys",
-    },
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1200&h=600&fit=crop",
-      title: "Safe & Secure Environment",
-      subtitle: "24/7 security and warden support for all students",
-      cta: "Learn More",
-      link: "/about",
-    },
-    {
-      id: 3,
-      image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&h=600&fit=crop",
-      title: "Easy Online Booking",
-      subtitle: "Book your bed in minutes with M-Pesa payment",
-      cta: "Book Now",
-      link: "/hostels/girls",
-    },
-  ];
-
-  // Features data
-  const features = [
-    {
-      icon: "bi-clock-history",
-      title: "10-Minute Hold",
-      description: "Your selected bed is held for 10 minutes while you complete payment",
-      color: "var(--mut-maroon)",
-    },
-    {
-      icon: "bi-phone",
-      title: "M-Pesa Payment",
-      description: "Pay instantly via M-Pesa STK push on your phone",
-      color: "var(--mut-gold)",
-    },
-    {
-      icon: "bi-qr-code",
-      title: "QR Receipt",
-      description: "Get a digital receipt with QR code for verification",
-      color: "var(--mut-maroon)",
-    },
-    {
-      icon: "bi-shield-check",
-      title: "Secure Booking",
-      description: "Your booking is confirmed instantly with a unique reference",
-      color: "var(--mut-gold)",
-    },
-  ];
-
-  // Testimonials
-  const testimonials = [
-    {
-      id: 1,
-      name: "John Mwangi",
-      course: "Computer Science, Year 3",
-      text: "The online booking system made it so easy to secure my hostel. I booked in 5 minutes!",
-      avatar: "https://ui-avatars.com/api/?name=John+Mwangi&background=800020&color=fff&size=100",
-    },
-    {
-      id: 2,
-      name: "Mary Wanjiru",
-      course: "Business Administration, Year 2",
-      text: "The M-Pesa payment was seamless. I received my receipt instantly after payment.",
-      avatar: "https://ui-avatars.com/api/?name=Mary+Wanjiru&background=800020&color=fff&size=100",
-    },
-    {
-      id: 3,
-      name: "Peter Ochieng",
-      course: "Engineering, Year 4",
-      text: "I love how I could see available beds in real-time and choose exactly where I want to stay.",
-      avatar: "https://ui-avatars.com/api/?name=Peter+Ochieng&background=800020&color=fff&size=100",
-    },
-  ];
-
-  // Auto-slide carousel
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [heroSlides.length]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const [boys, girls] = await Promise.all([
-          getHostels("boys"),
-          getHostels("girls"),
-        ]);
-        
-        const allHostels = [...boys, ...girls];
-        const totalBeds = allHostels.reduce((sum, h) => sum + (h.total_beds || 0), 0);
-        const availableBeds = allHostels.reduce((sum, h) => sum + (h.available_beds || 0), 0);
-        
-        setStats({
-          totalBeds,
-          availableBeds,
-          hostels: allHostels.length,
-        });
-      } catch (err) {
-        console.error("Failed to fetch stats:", err);
-      } finally {
-        setLoading(false);
-      }
+    let isMounted = true;
+    getHostels()
+      .then((data) => {
+        if (isMounted) setHostels(data);
+      })
+      .catch((err) => {
+        if (isMounted) setError(extractErrorMessages(err).join(" "));
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+    return () => {
+      isMounted = false;
     };
-
-    fetchStats();
   }, []);
-
-  const goToSlide = (index) => {
-    setCurrentSlide(index);
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-  };
 
   return (
     <>
-      {/* Hero Carousel Section */}
-      <section className="hero-carousel" style={{ position: "relative", overflow: "hidden" }}>
-        <div 
-          className="carousel-slides"
-          style={{
-            display: "flex",
-            transition: "transform 0.8s ease-in-out",
-            transform: `translateX(-${currentSlide * 100}%)`,
-          }}
-        >
-          {heroSlides.map((slide) => (
-            <div
-              key={slide.id}
-              className="carousel-slide"
-              style={{
-                minWidth: "100%",
-                minHeight: "600px",
-                backgroundImage: `url(${slide.image})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <div 
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(135deg, rgba(128,0,32,0.85) 0%, rgba(0,0,0,0.4) 100%)",
-                }}
-              />
-              <div className="container" style={{ position: "relative", zIndex: 1, color: "#fff" }}>
-                <div style={{ maxWidth: "600px" }}>
-                  <h1 
-                    style={{ 
-                      fontSize: "3.5rem", 
-                      fontWeight: 700, 
-                      marginBottom: "1rem",
-                      color: "#fff",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {slide.title}
-                  </h1>
-                  <p style={{ fontSize: "1.2rem", marginBottom: "2rem", color: "rgba(255,255,255,0.9)" }}>
-                    {slide.subtitle}
-                  </p>
-                  <Link to={slide.link} className="btn btn-primary btn-lg">
-                    <i className="bi bi-arrow-right" /> {slide.cta}
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Carousel Controls */}
-        <button
-          onClick={prevSlide}
-          style={{
-            position: "absolute",
-            left: "20px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            background: "rgba(255,255,255,0.2)",
-            border: "none",
-            color: "#fff",
-            fontSize: "2rem",
-            padding: "1rem",
-            borderRadius: "50%",
-            cursor: "pointer",
-            backdropFilter: "blur(4px)",
-            transition: "all 0.3s",
-            zIndex: 2,
-            width: "60px",
-            height: "60px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.3)"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
-          aria-label="Previous slide"
-        >
-          <i className="bi bi-chevron-left" />
-        </button>
-
-        <button
-          onClick={nextSlide}
-          style={{
-            position: "absolute",
-            right: "20px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            background: "rgba(255,255,255,0.2)",
-            border: "none",
-            color: "#fff",
-            fontSize: "2rem",
-            padding: "1rem",
-            borderRadius: "50%",
-            cursor: "pointer",
-            backdropFilter: "blur(4px)",
-            transition: "all 0.3s",
-            zIndex: 2,
-            width: "60px",
-            height: "60px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.3)"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
-          aria-label="Next slide"
-        >
-          <i className="bi bi-chevron-right" />
-        </button>
-
-        {/* Carousel Indicators */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "30px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            display: "flex",
-            gap: "10px",
-            zIndex: 2,
-          }}
-        >
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              style={{
-                width: "12px",
-                height: "12px",
-                borderRadius: "50%",
-                border: "none",
-                background: currentSlide === index ? "var(--mut-gold)" : "rgba(255,255,255,0.4)",
-                cursor: "pointer",
-                transition: "all 0.3s",
-                padding: 0,
-              }}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Quick Stats Section */}
-      <section className="section section-dark">
+      {/* START HOME */}
+      <section
+        className="home_bg hb_height"
+        style={{
+          backgroundImage: "url(/assets/img/bg/home-bg.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+        }}
+      >
         <div className="container">
-          <div className="grid grid-cols-4 gap-4 text-center">
-            <div>
-              <div style={{ fontSize: "3rem", fontWeight: "bold", color: "var(--mut-gold)" }}>
-                {loading ? (
-                  <span className="animate-pulse">...</span>
-                ) : (
-                  stats.hostels
-                )}
+          <div className="row">
+            <div className="col-lg-6 col-sm-12 col-xs-12">
+              <div className="hero-text ht_top">
+                <h1>
+                  <span>Smart Stay</span> Where Comfort Meets Campus
+                </h1>
+                <p>
+                  Book your Muranga University hostel bed in minutes, pay securely with M-Pesa,
+                  and get an instant e-receipt with a scannable QR code.
+                </p>
               </div>
-              <p style={{ color: "rgba(255,255,255,0.8)", marginTop: "0.5rem" }}>
-                <i className="bi bi-building" /> Hostel Blocks
-              </p>
-            </div>
-            <div>
-              <div style={{ fontSize: "3rem", fontWeight: "bold", color: "var(--mut-gold)" }}>
-                {loading ? (
-                  <span className="animate-pulse">...</span>
-                ) : (
-                  stats.totalBeds
-                )}
-              </div>
-              <p style={{ color: "rgba(255,255,255,0.8)", marginTop: "0.5rem" }}>
-                <i className="bi bi-bed" /> Total Beds
-              </p>
-            </div>
-            <div>
-              <div style={{ fontSize: "3rem", fontWeight: "bold", color: "var(--mut-gold)" }}>
-                {loading ? (
-                  <span className="animate-pulse">...</span>
-                ) : (
-                  stats.availableBeds
-                )}
-              </div>
-              <p style={{ color: "rgba(255,255,255,0.8)", marginTop: "0.5rem" }}>
-                <i className="bi bi-check-circle" /> Available Now
-              </p>
-            </div>
-            <div>
-              <div style={{ fontSize: "3rem", fontWeight: "bold", color: "var(--mut-gold)" }}>
-                24/7
-              </div>
-              <p style={{ color: "rgba(255,255,255,0.8)", marginTop: "0.5rem" }}>
-                <i className="bi bi-headset" /> Student Support
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="section">
-        <div className="container">
-          <h2 className="section-title text-center">Why Book With Us?</h2>
-          <p className="section-subtitle center" style={{ marginBottom: "2rem" }}>
-            We make it simple and convenient to secure your hostel accommodation
-          </p>
-
-          <div className="grid grid-cols-4 gap-4">
-            {features.map((feature, index) => (
-              <div 
-                key={index} 
-                className="card card-hover text-center"
-                style={{ 
-                  animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
-                }}
-              >
-                <div 
-                  className="feature-icon" 
-                  style={{ 
-                    margin: "0 auto",
-                    background: `linear-gradient(135deg, ${feature.color}15 0%, ${feature.color}05 100%)`,
-                    border: `2px solid ${feature.color}30`,
-                  }}
+              <div className="home_sb">
+                <form
+                  className="banner_subs"
+                  onSubmit={(e) => e.preventDefault()}
+                  action="/hostels"
                 >
-                  <i className={feature.icon} style={{ color: feature.color }} />
+                  <input
+                    type="text"
+                    className="form-control home_si"
+                    placeholder="Search hostels, e.g. Block A, Boys Hostel"
+                    required
+                  />
+                  <button type="submit" className="subscribe__btn">
+                    Search <i className="fa fa-paper-plane-o"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+            {/* END COL */}
+            <div className="col-lg-6 col-sm-12 col-xs-12">
+              <div className="hero-text-img">
+                <img src="/assets/img/home-img2.png" className="img-fluid" alt="Student moving into hostel" />
+                <div className="home_ps">
+                  <span className="ti-user"></span>
+                  <h2>4500+</h2>
+                  <p>Students housed</p>
                 </div>
-                <h3 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>{feature.title}</h3>
-                <p style={{ fontSize: "0.95rem" }}>{feature.description}</p>
+              </div>
+            </div>
+            {/* END COL */}
+          </div>
+          {/* END ROW */}
+        </div>
+        {/* END CONTAINER */}
+      </section>
+      {/* END HOME */}
+
+      {/* START COUNTER */}
+      <section className="count_area counter_feature">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-3 col-sm-6 col-xs-12">
+              <div className="single-counter">
+                <span className="ti-folder sc_one"></span>
+                <h2 className="counter-num">{hostels.length || "—"}</h2>
+                <p>Hostels Listed</p>
+              </div>
+            </div>
+            <div className="col-lg-3 col-sm-6 col-xs-12">
+              <div className="single-counter">
+                <span className="ti-medall-alt sc_two"></span>
+                <h2 className="counter-num">
+                  {hostels.reduce((sum, h) => sum + (h.available_beds || 0), 0) || "—"}
+                </h2>
+                <p>Beds Available Now</p>
+              </div>
+            </div>
+            {/* END COL */}
+            <div className="col-lg-3 col-sm-6 col-xs-12">
+              <div className="single-counter">
+                <span className="ti-id-badge sc_three"></span>
+                <h2 className="counter-num">10 Min</h2>
+                <p>Bed Hold While You Pay</p>
+              </div>
+            </div>
+            {/* END COL */}
+            <div className="col-lg-3 col-sm-6 col-xs-12">
+              <div className="single-counter">
+                <span className="ti-user sc_four"></span>
+                <h2 className="counter-num">M-Pesa</h2>
+                <p>Instant Secure Payment</p>
+              </div>
+            </div>
+            {/* END COL */}
+          </div>
+          {/* END ROW */}
+        </div>
+        {/* END CONTAINER */}
+      </section>
+      {/* END COUNTER */}
+
+      {/* START CATEGORY (how it works) */}
+      <section
+        className="top_cat__area section-padding"
+        style={{
+          backgroundImage: "url(/assets/img/bg/shape-1.png)",
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+        }}
+      >
+        <div className="container">
+          <div className="section-title text-center">
+            <h2>Book Your Bed In Four Simple Steps</h2>
+            <p>
+              From choosing a hostel to walking into your room, the whole process happens online -
+              no queues, no paperwork.
+            </p>
+          </div>
+          <div className="row">
+            <div
+              className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.2s"
+              data-wow-offset="0"
+            >
+              <div className="single_tp">
+                <span className="sc_one">01</span>
+                <h3>
+                  Choose Your <br />Hostel
+                </h3>
+                <p>Browse Boys and Girls hostels and see live bed availability per room.</p>
+              </div>
+            </div>
+            {/* END COL */}
+            <div
+              className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.3s"
+              data-wow-offset="0"
+            >
+              <div className="single_tp">
+                <span className="sc_two">02</span>
+                <h3>
+                  Pick Your <br />Bed
+                </h3>
+                <p>Select an exact bed in a room and we hold it for 10 minutes while you pay.</p>
+              </div>
+            </div>
+            {/* END COL */}
+            <div
+              className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.4s"
+              data-wow-offset="0"
+            >
+              <div className="single_tp">
+                <span className="sc_three">03</span>
+                <h3>
+                  Pay With <br />M-Pesa
+                </h3>
+                <p>Enter your Safaricom number and confirm the STK push on your phone.</p>
+              </div>
+            </div>
+            {/* END COL */}
+            <div
+              className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.4s"
+              data-wow-offset="0"
+            >
+              <div className="single_tp">
+                <span className="sc_four">04</span>
+                <h3>
+                  Get Your <br />Receipt
+                </h3>
+                <p>Download your e-receipt with a QR code and present it at check-in.</p>
+              </div>
+            </div>
+            {/* END COL */}
+          </div>
+          {/* END ROW */}
+        </div>
+        {/* END CONTAINER */}
+      </section>
+      {/* END CATEGORY */}
+
+      {/* START ABOUT US */}
+      <section className="ab_area section-padding">
+        <div className="container">
+          <div className="row">
+            <div
+              className="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.2s"
+              data-wow-offset="0"
+            >
+              <div className="ab_img">
+                <img src="/assets/img/about1.png" className="img-fluid" alt="Muranga University hostel" />
+              </div>
+            </div>
+            {/* END COL */}
+            <div
+              className="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.1s"
+              data-wow-offset="0"
+            >
+              <div className="ab_content">
+                <h2>Comfortable, Secure Accommodation Inside Muranga University</h2>
+                <p>
+                  Our hostels are managed directly by the university, giving every student a
+                  guarded, well-maintained place to stay a short walk from lecture halls.
+                </p>
+                <p>
+                  Every booking is tied to your registration details and confirmed instantly once
+                  M-Pesa payment goes through - no manual approval, no waiting in line at the
+                  accommodation office.
+                </p>
+                <ul>
+                  <li>
+                    <span className="ti-check"></span> Live bed-by-bed availability for every room
+                  </li>
+                  <li>
+                    <span className="ti-check"></span> Instant M-Pesa payment with automatic
+                    confirmation
+                  </li>
+                  <li>
+                    <span className="ti-check"></span> Downloadable receipt with a scannable QR
+                    code
+                  </li>
+                </ul>
+                <Link className="btn_one" to="/hostels">
+                  View All Hostels <i className="ti-arrow-top-right"></i>
+                </Link>
+              </div>
+            </div>
+            {/* END COL */}
+          </div>
+          {/* END ROW */}
+        </div>
+        {/* END CONTAINER */}
+      </section>
+      {/* END ABOUT US */}
+
+      {/* START CATEGORY (hostel types) */}
+      <section
+        className="top_cat__area section-padding"
+        style={{
+          backgroundImage: "url(/assets/img/bg/section-2.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+        }}
+      >
+        <div className="container">
+          <div className="section-title text-center">
+            <h2>Find Accommodation By Category</h2>
+            <p>Filter hostels by the categories students look for most.</p>
+          </div>
+          <div className="row">
+            <div
+              className="col-lg-12 col-sm-12 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.1s"
+              data-wow-offset="0"
+            >
+              <div className="cat_list">
+                <ul>
+                  <li>
+                    <Link to="/hostels?category=boys">
+                      <img src="/assets/img/e1.png" alt="Boys hostels" /> Boys Hostels
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/hostels?category=girls">
+                      <img src="/assets/img/e2.png" alt="Girls hostels" /> Girls Hostels
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/hostels">
+                      <img src="/assets/img/e3.png" alt="Available beds" /> Available Beds
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/hostels">
+                      <img src="/assets/img/e4.png" alt="Nearest to lecture halls" /> Near
+                      Lecture Halls
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/bookings/lookup">
+                      <img src="/assets/img/e5.png" alt="Track booking" /> Track My Booking
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/contact">
+                      <img src="/assets/img/e6.png" alt="Wardens" /> Talk To A Warden
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            {/* END COL */}
+          </div>
+          {/* END ROW */}
+        </div>
+        {/* END CONTAINER */}
+      </section>
+      {/* END CATEGORY */}
+
+      {/* START HOSTELS (live listing, was "course" section) */}
+      <section className="home_course section-padding">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-8 col-sm-6 col-xs-12">
+              <div className="section-title">
+                <h2>
+                  Browse <b>{hostels.length || ""} </b> <br />
+                  Hostels With Live Availability
+                </h2>
+              </div>
+            </div>
+            {/* END COL */}
+            <div className="col-lg-4 col-sm-6 col-xs-12">
+              <div className="cour_btn">
+                <Link to="/hostels" className="btn_one">
+                  View all Hostels <i className="ti-arrow-top-right"></i>
+                </Link>
+              </div>
+            </div>
+            {/* END COL */}
+          </div>
+          {/* END ROW */}
+
+          <div className="row">
+            {loading && (
+              <div className="col-12">
+                <p>Loading hostels…</p>
+              </div>
+            )}
+            {error && (
+              <div className="col-12">
+                <p>Could not load hostels right now: {error}</p>
+              </div>
+            )}
+            {!loading && !error && hostels.length === 0 && (
+              <div className="col-12">
+                <p>No hostels are published yet - check back soon.</p>
+              </div>
+            )}
+            {hostels.slice(0, 6).map((hostel) => (
+              <div className="col-lg-4 col-sm-6 col-xs-12" key={hostel.id}>
+                <div className="single_course">
+                  <div className="single_c_img">
+                    <img
+                      src={resolveMediaUrl(hostel.image) || "/assets/img/course/1.png"}
+                      className="img-fluid"
+                      alt={hostel.name}
+                    />
+                    <span>{hostel.category === "boys" ? "Boys Hostel" : "Girls Hostel"}</span>
+                  </div>
+                  <h4>
+                    <Link to={`/hostels/${hostel.id}`}>{hostel.name}</Link>
+                  </h4>
+                  <p>
+                    <span className="ti-user"> </span> {hostel.available_beds} / {hostel.total_beds}{" "}
+                    beds available
+                  </p>
+                  {hostel.location_notes && (
+                    <p>
+                      <span className="ti-location-pin"> </span> {hostel.location_notes}
+                    </p>
+                  )}
+                  <div className="price">Fee - KES {hostel.fee_amount}</div>
+                </div>
               </div>
             ))}
           </div>
+          {/* END ROW */}
         </div>
+        {/* END CONTAINER */}
       </section>
+      {/* END HOSTELS */}
 
-      {/* How It Works Section */}
-      <section className="section section-light">
+      {/* START VIDEO */}
+      <section className="vid_area section-padding">
         <div className="container">
-          <h2 className="section-title text-center">How It Works</h2>
-          <p className="section-subtitle center" style={{ marginBottom: "2rem" }}>
-            Book your hostel bed in three simple steps
-          </p>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center" style={{ padding: "2rem" }}>
-              <div 
+          <div className="row">
+            <div
+              className="col-lg-12 vp_top wow fadeInUDown"
+              data-wow-duration="1s"
+              data-wow-delay="0.2s"
+              data-wow-offset="0"
+            >
+              <div
+                className="video-area"
                 style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "50%",
-                  background: "var(--mut-maroon)",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "2rem",
-                  margin: "0 auto 1rem",
+                  backgroundImage: "url(/assets/img/bg/video.jpg)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center center",
                 }}
               >
-                1
+                <a
+                  href="https://www.youtube.com/watch?v=RXv_uIN6e-Y"
+                  className="magnific_popup video-button"
+                >
+                  <i className="fa fa-play"></i>
+                </a>
               </div>
-              <h3 style={{ fontSize: "1.2rem" }}>Choose Your Hostel</h3>
-              <p style={{ color: "var(--mut-text-muted)" }}>
-                Browse available hostels and select your preferred room and bed
-              </p>
             </div>
-
-            <div className="text-center" style={{ padding: "2rem" }}>
-              <div 
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "50%",
-                  background: "var(--mut-gold)",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "2rem",
-                  margin: "0 auto 1rem",
-                }}
-              >
-                2
-              </div>
-              <h3 style={{ fontSize: "1.2rem" }}>Provide Your Details</h3>
-              <p style={{ color: "var(--mut-text-muted)" }}>
-                Fill in your student details and confirm your booking
-              </p>
-            </div>
-
-            <div className="text-center" style={{ padding: "2rem" }}>
-              <div 
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "50%",
-                  background: "var(--mut-maroon)",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "2rem",
-                  margin: "0 auto 1rem",
-                }}
-              >
-                3
-              </div>
-              <h3 style={{ fontSize: "1.2rem" }}>Pay via M-Pesa</h3>
-              <p style={{ color: "var(--mut-text-muted)" }}>
-                Complete payment via M-Pesa and get instant confirmation
-              </p>
-            </div>
+            {/* END COL */}
           </div>
-
-          <div style={{ textAlign: "center", marginTop: "2rem" }}>
-            <Link to="/hostels/boys" className="btn btn-primary btn-lg">
-              <i className="bi bi-door-open" /> Get Started Now
-            </Link>
-          </div>
+          {/* END ROW */}
         </div>
+        {/* END CONTAINER */}
       </section>
+      {/* END VIDEO */}
 
-      {/* Testimonials Section */}
-      <section className="section">
+      {/* START TEAM (hostel wardens) */}
+      <section className="team_area section-padding">
         <div className="container">
-          <h2 className="section-title text-center">What Students Say</h2>
-          <p className="section-subtitle center" style={{ marginBottom: "2rem" }}>
-            Hear from students who have successfully booked their hostels
-          </p>
+          <div className="section-title text-center">
+            <h2>Meet Your Hostel Wardens</h2>
+            <p>Every hostel block has a dedicated warden you can reach directly for anything you need.</p>
+          </div>
+          <div className="row">
+            <div
+              className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.1s"
+              data-wow-offset="0"
+            >
+              <div className="our-team">
+                <div className="team-content">
+                  <a href="#">
+                    <img src="/assets/img/team/team1.jpg" alt="Hostel warden" />
+                  </a>
+                  <ul className="social-links">
+                    <li>
+                      <a href="#">
+                        <i className="fa-solid fa-phone"></i>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <i className="fa-solid fa-envelope"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div className="team-prof">
+                  <h3>Mrs. Wanjiru Kamau</h3>
+                  <span>Warden, Boys Hostel Block A</span>
+                </div>
+                <div className="sth_det2">
+                  <span className="ti-home"> <u>Block A</u></span>
+                  <span className="ti-user"> <u>120 Students</u></span>
+                </div>
+              </div>
+            </div>
+            {/* END COL */}
+            <div
+              className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.1s"
+              data-wow-offset="0"
+            >
+              <div className="our-team">
+                <div className="team-content">
+                  <a href="#">
+                    <img src="/assets/img/team/team2.jpg" alt="Hostel warden" />
+                  </a>
+                  <ul className="social-links">
+                    <li>
+                      <a href="#">
+                        <i className="fa-solid fa-phone"></i>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <i className="fa-solid fa-envelope"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div className="team-prof">
+                  <h3>Mr. Otieno Mwangi</h3>
+                  <span>Warden, Boys Hostel Block B</span>
+                </div>
+                <div className="sth_det2">
+                  <span className="ti-home"> <u>Block B</u></span>
+                  <span className="ti-user"> <u>96 Students</u></span>
+                </div>
+              </div>
+            </div>
+            {/* END COL */}
+            <div
+              className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.1s"
+              data-wow-offset="0"
+            >
+              <div className="our-team">
+                <div className="team-content">
+                  <a href="#">
+                    <img src="/assets/img/team/team3.jpg" alt="Hostel warden" />
+                  </a>
+                  <ul className="social-links">
+                    <li>
+                      <a href="#">
+                        <i className="fa-solid fa-phone"></i>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <i className="fa-solid fa-envelope"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div className="team-prof">
+                  <h3>Mrs. Achieng Otieno</h3>
+                  <span>Warden, Girls Hostel Block A</span>
+                </div>
+                <div className="sth_det2">
+                  <span className="ti-home"> <u>Block A</u></span>
+                  <span className="ti-user"> <u>140 Students</u></span>
+                </div>
+              </div>
+            </div>
+            {/* END COL */}
+            <div
+              className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.1s"
+              data-wow-offset="0"
+            >
+              <div className="our-team">
+                <div className="team-content">
+                  <a href="#">
+                    <img src="/assets/img/team/team4.jpg" alt="Hostel warden" />
+                  </a>
+                  <ul className="social-links">
+                    <li>
+                      <a href="#">
+                        <i className="fa-solid fa-phone"></i>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <i className="fa-solid fa-envelope"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div className="team-prof">
+                  <h3>Ms. Faith Njeri</h3>
+                  <span>Warden, Girls Hostel Block B</span>
+                </div>
+                <div className="sth_det2">
+                  <span className="ti-home"> <u>Block B</u></span>
+                  <span className="ti-user"> <u>110 Students</u></span>
+                </div>
+              </div>
+            </div>
+            {/* END COL */}
+          </div>
+          {/* END ROW */}
+        </div>
+        {/* END CONTAINER */}
+      </section>
+      {/* END TEAM */}
 
-          <div className="grid grid-cols-3 gap-4">
-            {testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="card" style={{ padding: "2rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
-                  <img 
-                    src={testimonial.avatar} 
-                    alt={testimonial.name}
-                    style={{
-                      width: "60px",
-                      height: "60px",
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                    }}
-                    loading="lazy"
-                  />
-                  <div>
-                    <h4 style={{ marginBottom: 0, fontSize: "1rem" }}>{testimonial.name}</h4>
-                    <p style={{ fontSize: "0.85rem", color: "var(--mut-text-muted)", marginBottom: 0 }}>
-                      {testimonial.course}
+      {/* START PROMO */}
+      <section className="ab_area section-padding">
+        <div className="container">
+          <div className="row">
+            <div
+              className="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.1s"
+              data-wow-offset="0"
+            >
+              <div className="ab_content">
+                <h2>Why Students Choose Our Online Booking</h2>
+                <p>
+                  No more standing in line outside the accommodation office. Reserve your bed the
+                  moment admissions open and pay from anywhere.
+                </p>
+                <p>
+                  Every payment is reconciled automatically through M-Pesa Daraja, so your bed is
+                  confirmed the second your STK push succeeds.
+                </p>
+                <ul>
+                  <li>
+                    <span className="ti-check"></span> A 10-minute hold protects your bed while
+                    you pay
+                  </li>
+                  <li>
+                    <span className="ti-check"></span> Works for both national ID and birth
+                    certificate holders
+                  </li>
+                  <li>
+                    <span className="ti-check"></span> Get an emailed receipt the moment you pay
+                  </li>
+                </ul>
+                <Link className="btn_one" to="/hostels">
+                  Book Your Bed <i className="ti-arrow-top-right"></i>
+                </Link>
+              </div>
+            </div>
+            {/* END COL */}
+            <div
+              className="col-lg-6 col-sm-12 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.2s"
+              data-wow-offset="0"
+            >
+              <div className="ab_img">
+                <img src="/assets/img/about3.png" className="img-fluid" alt="Booking on a laptop" />
+                <div className="home_ps2">
+                  <span className="ti-book"></span>
+                  <h2>{hostels.reduce((sum, h) => sum + (h.total_beds || 0), 0) || "3300+"}</h2>
+                  <p>Total Beds Managed</p>
+                </div>
+              </div>
+            </div>
+            {/* END COL */}
+          </div>
+          {/* END ROW */}
+        </div>
+        {/* END CONTAINER */}
+      </section>
+      {/* END PROMO */}
+
+      {/* START TESTIMONIALS */}
+      <section className="testi_area section-padding">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              What Students Say About <br />Booking Online
+            </h2>
+          </div>
+          <div className="row">
+            <div className="col-lg-6 col-sm-12 col-xs-12">
+              <div className="ab_img">
+                <img src="/assets/img/review.png" className="img-fluid" alt="Student review" />
+              </div>
+            </div>
+            {/* END COL */}
+            <div className="col-lg-6 col-sm-12 col-xs-12">
+              <div id="testimonial-slider" className="owl-carousel">
+                <div className="testimonial">
+                  <img src="/assets/img/quote.png" alt="" />
+                  <div className="testimonial_content">
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <p>
+                      I booked my bed from home the day admissions opened and paid with M-Pesa in
+                      under two minutes. No queues at all.
                     </p>
                   </div>
+                  <div className="testi_pic_title">
+                    <img src="/assets/img/testimonial/1.png" alt="" />
+                    <h4>Brian Kiptoo</h4>
+                    <p>First Year, Boys Hostel Block A</p>
+                  </div>
                 </div>
-                <p style={{ fontStyle: "italic", marginBottom: 0 }}>
-                  "{testimonial.text}"
-                </p>
-                <div style={{ marginTop: "0.5rem", color: "var(--mut-gold)" }}>
-                  <i className="bi bi-star-fill" />
-                  <i className="bi bi-star-fill" />
-                  <i className="bi bi-star-fill" />
-                  <i className="bi bi-star-fill" />
-                  <i className="bi bi-star-fill" />
+                {/* END TESTIMONIAL */}
+                <div className="testimonial">
+                  <img src="/assets/img/quote.png" alt="" />
+                  <div className="testimonial_content">
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <p>
+                      Seeing exactly which bed was free before paying gave me confidence I would
+                      not lose my money on a room that was already full.
+                    </p>
+                  </div>
+                  <div className="testi_pic_title">
+                    <img src="/assets/img/testimonial/2.png" alt="" />
+                    <h4>Sharon Achieng</h4>
+                    <p>Second Year, Girls Hostel Block A</p>
+                  </div>
+                </div>
+                {/* END TESTIMONIAL */}
+                <div className="testimonial">
+                  <img src="/assets/img/quote.png" alt="" />
+                  <div className="testimonial_content">
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <i className="ti-star"></i>
+                    <p>
+                      My receipt with the QR code made check-in day so fast - the warden just
+                      scanned it and I was done.
+                    </p>
+                  </div>
+                  <div className="testi_pic_title">
+                    <img src="/assets/img/testimonial/3.png" alt="" />
+                    <h4>Kevin Mutua</h4>
+                    <p>Third Year, Boys Hostel Block B</p>
+                  </div>
+                </div>
+                {/* END TESTIMONIAL */}
+              </div>
+              {/* END TESTIMONIAL SLIDER */}
+            </div>
+            {/* END COL */}
+          </div>
+          {/* END ROW */}
+        </div>
+        {/* END CONTAINER */}
+      </section>
+      {/* END TESTIMONIALS */}
+
+      {/* START BLOG (hostel announcements) */}
+      <section id="blog" className="blog_area section-padding">
+        <div className="container">
+          <div className="section-title text-center">
+            <h2>Latest Hostel Announcements</h2>
+            <p>Stay up to date with booking deadlines, fee changes and hostel notices.</p>
+          </div>
+          <div className="row">
+            <div
+              className="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.1s"
+              data-wow-offset="0"
+            >
+              <div className="single_blog">
+                <img src="/assets/img/blog/1.jpg" className="img-fluid" alt="Hostel announcement" />
+                <div className="content_box">
+                  <span>
+                    Aug 1, 2026 | <a href="#">Booking</a>
+                  </span>
+                  <h2>
+                    <a href="#">First-Year Booking Opens Next Week</a>
+                  </h2>
+                  <a className="btn_one" href="#">
+                    Read More <i className="ti-arrow-top-right"></i>
+                  </a>
                 </div>
               </div>
-            ))}
+            </div>
+            {/* END COL*/}
+            <div
+              className="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.1s"
+              data-wow-offset="0"
+            >
+              <div className="single_blog">
+                <img src="/assets/img/blog/2.jpg" className="img-fluid" alt="Hostel announcement" />
+                <div className="content_box">
+                  <span>
+                    Jul 20, 2026 | <a href="#">Payments</a>
+                  </span>
+                  <h2>
+                    <a href="#">M-Pesa Is Now The Only Accepted Payment Method</a>
+                  </h2>
+                  <a className="btn_one" href="#">
+                    Read More <i className="ti-arrow-top-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+            {/* END COL*/}
+            <div
+              className="col-lg-4 col-sm-4 col-xs-12 wow fadeInUp"
+              data-wow-duration="1s"
+              data-wow-delay="0.3s"
+              data-wow-offset="0"
+            >
+              <div className="single_blog">
+                <img src="/assets/img/blog/3.jpg" className="img-fluid" alt="Hostel announcement" />
+                <div className="content_box">
+                  <span>
+                    Jul 5, 2026 | <a href="#">Notice</a>
+                  </span>
+                  <h2>
+                    <a href="#">Beds Are Held For Only 10 Minutes During Checkout</a>
+                  </h2>
+                  <a className="btn_one" href="#">
+                    Read More <i className="ti-arrow-top-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+            {/* END COL*/}
           </div>
+          {/* / END ROW */}
         </div>
+        {/* END CONTAINER  */}
       </section>
-
-      {/* CTA Section */}
-      <section className="section section-gold text-center">
-        <div className="container">
-          <h2 style={{ color: "#fff", fontSize: "2.5rem" }}>
-            Ready to Book Your Hostel?
-          </h2>
-          <p style={{ 
-            color: "rgba(255,255,255,0.9)", 
-            maxWidth: "600px", 
-            margin: "0 auto 2rem",
-            fontSize: "1.2rem",
-          }}>
-            Choose from our comfortable hostel accommodations and secure your bed today.
-            <br />
-            <strong>Available beds are filling up fast!</strong>
-          </p>
-          <div className="btn-group" style={{ justifyContent: "center" }}>
-            <Link to="/hostels/boys" className="btn btn-dark btn-lg">
-              <i className="bi bi-eye" /> View Available Hostels
-            </Link>
-            <Link to="/about" className="btn btn-outline-light btn-lg">
-              <i className="bi bi-info-circle" /> Learn More
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <style>{`
-        .hero-carousel {
-          min-height: 600px;
-          background: var(--mut-maroon);
-        }
-
-        .carousel-slide {
-          min-height: 600px;
-        }
-
-        .feature-icon {
-          width: 70px;
-          height: 70px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.8rem;
-          margin-bottom: 1rem;
-          transition: all 0.3s ease;
-        }
-
-        .card:hover .feature-icon {
-          transform: scale(1.1);
-        }
-
-        @media (max-width: 768px) {
-          .carousel-slide {
-            min-height: 400px;
-          }
-
-          .hero-carousel {
-            min-height: 400px;
-          }
-
-          .hero-carousel h1 {
-            font-size: 2rem !important;
-          }
-
-          .hero-carousel .btn {
-            font-size: 0.9rem;
-            padding: 0.6rem 1.2rem;
-          }
-
-          .carousel-slides button {
-            width: 40px !important;
-            height: 40px !important;
-            font-size: 1.2rem !important;
-            padding: 0.5rem !important;
-          }
-
-          .grid-cols-4 {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          .grid-cols-3 {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .grid-cols-4 {
-            grid-template-columns: 1fr 1fr;
-          }
-
-          .carousel-slide {
-            min-height: 350px;
-          }
-
-          .hero-carousel {
-            min-height: 350px;
-          }
-
-          .hero-carousel h1 {
-            font-size: 1.5rem !important;
-          }
-        }
-      `}</style>
+      {/* END BLOG */}
     </>
   );
 }

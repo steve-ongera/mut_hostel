@@ -1,116 +1,119 @@
-// src/components/Navbar.jsx
-import { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
-
-const NAV_LINKS = [
-  { to: "/", label: "Home", icon: "bi bi-house" },
-  { to: "/hostels/boys", label: "Boys Hostels", icon: "bi bi-building" },
-  { to: "/hostels/girls", label: "Girls Hostels", icon: "bi bi-building" },
-  { to: "/about", label: "About", icon: "bi bi-info-circle" },
-];
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Close mobile menu on window resize to desktop
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768 && open) {
-        setOpen(false);
-      }
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [open]);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className={`navbar ${scrolled ? "scrolled" : ""}`}>
-      <div className="container">
-        <Link to="/" className="navbar-brand" onClick={() => setOpen(false)}>
-          <span className="brand-icon">
-            <i className="bi bi-building" />
-          </span>
-          <span className="brand-text">
-            <strong>MUT Hostel Portal</strong>
-            <small>Book your bed online</small>
-          </span>
-        </Link>
-
-        <nav className={`navbar-nav ${open ? "open" : ""}`}>
-          {NAV_LINKS.map((link) => (
-            <div key={link.to} className="nav-item">
-              <NavLink
-                to={link.to}
-                className={({ isActive }) => 
-                  `nav-link ${isActive ? "active" : ""}`
-                }
-                onClick={() => setOpen(false)}
-              >
-                <i className={link.icon} style={{ marginRight: "6px" }} />
-                {link.label}
-              </NavLink>
+    <div id="navigation" className="navbar-light bg-faded site-navigation">
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-20 align-self-center">
+            <div className="site-logo">
+              <Link to="/">
+                <img src="/assets/img/logo.png" alt="Muranga University Hostel Booking" />
+              </Link>
             </div>
-          ))}
-          
-          {/* Mobile-only Book a Bed button */}
-          <div className="nav-item" style={{ display: "none" }}>
-            <Link 
-              to="/hostels/boys" 
-              className="btn btn-primary"
-              style={{ width: "100%", marginTop: "8px" }}
-              onClick={() => setOpen(false)}
-            >
-              <i className="bi bi-door-open" /> Book a Bed
+          </div>
+          {/* END Col */}
+
+          <div className="col-60 d-flex">
+            <nav id="main-menu">
+              <ul>
+                <li>
+                  <Link to="/">Home</Link>
+                </li>
+                <li>
+                  <Link to="/about">About</Link>
+                </li>
+                <li className="menu-item-has-children">
+                  <Link to="/hostels">Hostels</Link>
+                  <ul>
+                    <li>
+                      <Link to="/hostels?category=boys">Boys Hostels</Link>
+                    </li>
+                    <li>
+                      <Link to="/hostels?category=girls">Girls Hostels</Link>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <Link to="/hostels">Book a Bed</Link>
+                </li>
+                <li>
+                  <Link to="/bookings/lookup">Track Booking</Link>
+                </li>
+                <li>
+                  <Link to="/contact">Contact</Link>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          {/* END Col */}
+
+          <div className="col-20 d-none d-xl-block text-end align-self-center">
+            <Link to="/bookings/lookup" className="header-btn">
+              Track Booking
+            </Link>
+            <Link to="/hostels" className="btn_one">
+              Book Now
             </Link>
           </div>
-        </nav>
+          {/* END Col */}
 
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <Link 
-            to="/hostels/boys" 
-            className="btn btn-primary desktop-only"
-            style={{ 
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px"
-            }}
-          >
-            <i className="bi bi-door-open" /> Book a Bed
-          </Link>
+          <ul className={`mobile_menu ${mobileOpen ? "show" : ""}`}>
+            <li>
+              <Link to="/" onClick={() => setMobileOpen(false)}>
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" onClick={() => setMobileOpen(false)}>
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/hostels" onClick={() => setMobileOpen(false)}>
+                Hostels
+              </Link>
+              <ul className="sub-menu">
+                <li>
+                  <Link to="/hostels?category=boys" onClick={() => setMobileOpen(false)}>
+                    Boys Hostels
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/hostels?category=girls" onClick={() => setMobileOpen(false)}>
+                    Girls Hostels
+                  </Link>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <Link to="/bookings/lookup" onClick={() => setMobileOpen(false)}>
+                Track Booking
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact" onClick={() => setMobileOpen(false)}>
+                Contact
+              </Link>
+            </li>
+          </ul>
+
           <button
-            className="navbar-toggler"
-            aria-label="Toggle navigation menu"
-            onClick={() => setOpen((v) => !v)}
+            type="button"
+            id="sm_menu_ham"
+            aria-label="Toggle menu"
+            onClick={() => setMobileOpen((open) => !open)}
+            style={{ display: "none" }}
           >
-            <i className={open ? "bi bi-x-lg" : "bi bi-list"} />
+            <i className="fa fa-bars"></i>
           </button>
         </div>
+        {/* END ROW */}
       </div>
-
-      <style>{`
-        .desktop-only {
-          display: inline-flex !important;
-        }
-        
-        @media (max-width: 768px) {
-          .desktop-only {
-            display: none !important;
-          }
-          
-          .navbar-nav .nav-item:last-child {
-            display: block !important;
-          }
-        }
-      `}</style>
-    </header>
+      {/* END CONTAINER */}
+    </div>
   );
 }
