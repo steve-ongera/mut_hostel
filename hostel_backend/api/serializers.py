@@ -81,7 +81,7 @@ class HostelListSerializer(serializers.ModelSerializer):
             "name",
             "category",
             "description",
-            "fee_amount", 
+            "fee_amount",
             "image",
             "warden_name",
             "warden_phone",
@@ -143,7 +143,15 @@ class BookingCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"room": "Selected room does not belong to the selected hostel."})
 
         bed.release_if_expired()
-        if bed.status != Bed.STATUS_AVAILABLE:
+
+        # A bed reaching this point is valid if it's:
+        #  - "available"  -> edge case, form was somehow reached without holding it
+        #  - "pending" and NOT expired -> the normal case: this student holds it
+        #    via holdBed() on page load, so status is *always* "pending" here.
+        # Previously this only accepted STATUS_AVAILABLE, which meant every
+        # booking submitted within the 5-minute hold window (i.e. practically
+        # every booking) was rejected as "no longer available."
+        if bed.status not in (Bed.STATUS_AVAILABLE, Bed.STATUS_PENDING):
             raise serializers.ValidationError({"bed": "This bed is no longer available. Please choose another bed."})
 
         return attrs

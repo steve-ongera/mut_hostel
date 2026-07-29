@@ -72,6 +72,9 @@ class Room(models.Model):
 
 
 class Bed(models.Model):
+    """A single bed in a room. Gets locked (status=pending) for a few minutes
+    while a student fills out the booking form, then either booked or released."""
+
     STATUS_AVAILABLE = "available"
     STATUS_PENDING = "pending"
     STATUS_BOOKED = "booked"
@@ -82,61 +85,6 @@ class Bed(models.Model):
     ]
 
     HOLD_DURATION_MINUTES = 5  # how long a selected bed stays locked for one student
-
-    room = models.ForeignKey(Room, related_name="beds", on_delete=models.CASCADE)
-    bed_number = models.CharField(max_length=10)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_AVAILABLE)
-    hold_expires_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["room", "bed_number"]
-        unique_together = ("room", "bed_number")
-
-    def __str__(self):
-        return f"{self.room} - Bed {self.bed_number}"
-
-    def is_effectively_available(self):
-        if self.status == self.STATUS_AVAILABLE:
-            return True
-        if self.status == self.STATUS_PENDING and self.hold_expires_at and self.hold_expires_at < timezone.now():
-            return True
-        return False
-
-    def release_if_expired(self):
-        if self.status == self.STATUS_PENDING and self.hold_expires_at and self.hold_expires_at < timezone.now():
-            self.status = self.STATUS_AVAILABLE
-            self.hold_expires_at = None
-            self.save(update_fields=["status", "hold_expires_at", "updated_at"])
-            Booking.objects.filter(bed=self, status=Booking.STATUS_PENDING_PAYMENT).update(
-                status=Booking.STATUS_EXPIRED
-            )
-            return True
-        return False
-
-    def hold(self, minutes=None):
-        minutes = minutes or self.HOLD_DURATION_MINUTES
-        self.status = self.STATUS_PENDING
-        self.hold_expires_at = timezone.now() + timedelta(minutes=minutes)
-        self.save(update_fields=["status", "hold_expires_at", "updated_at"])
-
-    def confirm_booked(self):
-        self.status = self.STATUS_BOOKED
-        self.hold_expires_at = None
-        self.save(update_fields=["status", "hold_expires_at", "updated_at"])
-
-    def release(self):
-        self.status = self.STATUS_AVAILABLE
-        self.hold_expires_at = None
-        self.save(update_fields=["status", "hold_expires_at", "updated_at"])
-    STATUS_AVAILABLE = "available"
-    STATUS_PENDING = "pending"
-    STATUS_BOOKED = "booked"
-    STATUS_CHOICES = [
-        (STATUS_AVAILABLE, "Available"),
-        (STATUS_PENDING, "Pending Payment"),
-        (STATUS_BOOKED, "Booked"),
-    ]
 
     room = models.ForeignKey(Room, related_name="beds", on_delete=models.CASCADE)
     bed_number = models.CharField(max_length=10)
@@ -170,7 +118,8 @@ class Bed(models.Model):
             return True
         return False
 
-    def hold(self, minutes=10):
+    def hold(self, minutes=None):
+        minutes = minutes or self.HOLD_DURATION_MINUTES
         self.status = self.STATUS_PENDING
         self.hold_expires_at = timezone.now() + timedelta(minutes=minutes)
         self.save(update_fields=["status", "hold_expires_at", "updated_at"])
@@ -219,7 +168,15 @@ class Booking(models.Model):
     # Hostel selection
     hostel = models.ForeignKey(Hostel, related_name="bookings", on_delete=models.PROTECT)
     room = models.ForeignKey(Room, related_name="bookings", on_delete=models.PROTECT)
-    bed = models.OneToOneField(Bed, related_name="booking", on_delete=models.PROTECT)
+
+    # NOTE: This was previously a OneToOneField, which put a permanent unique
+    # constraint on `bed` at the DB level. That meant once a single Booking row
+    # was created for a bed (even one that later expired or was cancelled),
+    # no booking could ever be created for that bed again -> permanent 400s.
+    # It's now a ForeignKey so a bed can accumulate a history of bookings
+    # (expired/cancelled/paid), and "only one *active* booking per bed" is
+    # enforced instead via the conditional UniqueConstraint below.
+    bed = models.ForeignKey(Bed, related_name="bookings", on_delete=models.PROTECT)
 
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING_PAYMENT)
@@ -234,6 +191,16 @@ class Booking(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            # Only one *active* (pending_payment or paid) booking allowed per
+            # bed at a time. Expired/cancelled bookings are excluded, so they
+            # don't permanently block the bed from being booked again.
+            models.UniqueConstraint(
+                fields=["bed"],
+                condition=models.Q(status__in=["pending_payment", "paid"]),
+                name="one_active_booking_per_bed",
+            )
+        ]
 
     def __str__(self):
         return f"{self.booking_reference} - {self.full_name}"

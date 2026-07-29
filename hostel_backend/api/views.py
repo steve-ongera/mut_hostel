@@ -1,247 +1,267 @@
-#api/models.py
-import uuid
-from datetime import timedelta
+#api/views.py
+import logging
 
-from django.db import models
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.core.validators import MinValueValidator
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import Hostel, Room, Bed, Booking, MpesaTransaction
+from .serializers import (
+    HostelListSerializer,
+    HostelDetailSerializer,
+    RoomSerializer,
+    BedHoldSerializer,
+    BookingCreateSerializer,
+    BookingSerializer,
+    STKPushRequestSerializer,
+)
+
+from .mpesa_service import MpesaClient, MpesaError
+from .receipt_service import generate_qr_code, send_receipt_email, build_receipt_pdf
+
+logger = logging.getLogger(__name__)
 
 
-def hostel_image_path(instance, filename):
-    return f"hostels/{instance.category}/{filename}"
+class BedDetailView(APIView):
+    """
+    GET /api/beds/<id>/
+    Returns the bed with its hostel/room context and current hold countdown.
+    Used by the booking form to rehydrate state purely from the URL's bedId,
+    regardless of how the page was reached (fresh nav, refresh, back button).
+    """
+
+    def get(self, request, pk):
+        bed = get_object_or_404(Bed.objects.select_related("room", "room__hostel"), pk=pk)
+        bed.release_if_expired()
+        serializer = BedHoldSerializer(bed)
+        return Response(serializer.data)
 
 
-def qr_code_path(instance, filename):
-    return f"receipts/qrcodes/{instance.booking_reference}.png"
+class BedHoldView(APIView):
+    """
+    POST   /api/beds/<id>/hold/   - lock the bed for HOLD_DURATION_MINUTES (5 min)
+    DELETE /api/beds/<id>/hold/   - release the hold early (e.g. user navigates away)
+    """
 
+    def post(self, request, pk):
+        bed = get_object_or_404(Bed.objects.select_related("room", "room__hostel"), pk=pk)
+        bed.release_if_expired()
 
-class Hostel(models.Model):
-    """A hostel block, either for Boys or Girls, with a fixed fee per bed."""
-
-    CATEGORY_BOYS = "boys"
-    CATEGORY_GIRLS = "girls"
-    CATEGORY_CHOICES = [
-        (CATEGORY_BOYS, "Boys Hostel"),
-        (CATEGORY_GIRLS, "Girls Hostel"),
-    ]
-
-    name = models.CharField(max_length=150)
-    category = models.CharField(max_length=10, choices=CATEGORY_CHOICES)
-    description = models.TextField(blank=True)
-    fee_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
-    image = models.ImageField(upload_to=hostel_image_path, blank=True, null=True)
-    warden_name = models.CharField(max_length=150, blank=True)
-    warden_phone = models.CharField(max_length=20, blank=True)
-    location_notes = models.CharField(max_length=255, blank=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["category", "name"]
-
-    def __str__(self):
-        return f"{self.name} ({self.get_category_display()})"
-
-    @property
-    def total_beds(self):
-        return Bed.objects.filter(room__hostel=self).count()
-
-    @property
-    def available_beds(self):
-        return Bed.objects.filter(room__hostel=self, status=Bed.STATUS_AVAILABLE).count()
-
-
-class Room(models.Model):
-    hostel = models.ForeignKey(Hostel, related_name="rooms", on_delete=models.CASCADE)
-    room_number = models.CharField(max_length=20)
-    floor = models.CharField(max_length=20, blank=True)
-    capacity = models.PositiveSmallIntegerField(default=4, help_text="Number of beds in this room")
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        ordering = ["hostel", "room_number"]
-        unique_together = ("hostel", "room_number")
-
-    def __str__(self):
-        return f"{self.hostel.name} - Room {self.room_number}"
-
-    @property
-    def available_beds_count(self):
-        return self.beds.filter(status=Bed.STATUS_AVAILABLE).count()
-
-
-class Bed(models.Model):
-    """A single bed in a room. Gets locked (status=pending) for a few minutes
-    while a student fills out the booking form, then either booked or released."""
-
-    STATUS_AVAILABLE = "available"
-    STATUS_PENDING = "pending"
-    STATUS_BOOKED = "booked"
-    STATUS_CHOICES = [
-        (STATUS_AVAILABLE, "Available"),
-        (STATUS_PENDING, "Pending Payment"),
-        (STATUS_BOOKED, "Booked"),
-    ]
-
-    HOLD_DURATION_MINUTES = 5  # how long a selected bed stays locked for one student
-
-    room = models.ForeignKey(Room, related_name="beds", on_delete=models.CASCADE)
-    bed_number = models.CharField(max_length=10)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_AVAILABLE)
-    hold_expires_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["room", "bed_number"]
-        unique_together = ("room", "bed_number")
-
-    def __str__(self):
-        return f"{self.room} - Bed {self.bed_number}"
-
-    def is_effectively_available(self):
-        """A bed counts as available if free, or its pending hold has expired."""
-        if self.status == self.STATUS_AVAILABLE:
-            return True
-        if self.status == self.STATUS_PENDING and self.hold_expires_at and self.hold_expires_at < timezone.now():
-            return True
-        return False
-
-    def release_if_expired(self):
-        if self.status == self.STATUS_PENDING and self.hold_expires_at and self.hold_expires_at < timezone.now():
-            self.status = self.STATUS_AVAILABLE
-            self.hold_expires_at = None
-            self.save(update_fields=["status", "hold_expires_at", "updated_at"])
-            Booking.objects.filter(bed=self, status=Booking.STATUS_PENDING_PAYMENT).update(
-                status=Booking.STATUS_EXPIRED
+        if bed.status == Bed.STATUS_BOOKED:
+            return Response(
+                {"detail": "This bed has already been booked. Please choose another bed."},
+                status=status.HTTP_409_CONFLICT,
             )
-            return True
-        return False
 
-    def hold(self, minutes=None):
-        minutes = minutes or self.HOLD_DURATION_MINUTES
-        self.status = self.STATUS_PENDING
-        self.hold_expires_at = timezone.now() + timedelta(minutes=minutes)
-        self.save(update_fields=["status", "hold_expires_at", "updated_at"])
+        bed.hold()
+        serializer = BedHoldSerializer(bed)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def confirm_booked(self):
-        self.status = self.STATUS_BOOKED
-        self.hold_expires_at = None
-        self.save(update_fields=["status", "hold_expires_at", "updated_at"])
-
-    def release(self):
-        self.status = self.STATUS_AVAILABLE
-        self.hold_expires_at = None
-        self.save(update_fields=["status", "hold_expires_at", "updated_at"])
+    def delete(self, request, pk):
+        bed = get_object_or_404(Bed, pk=pk)
+        bed.release_if_expired()
+        if bed.status == Bed.STATUS_PENDING:
+            bed.release()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-def generate_booking_reference():
-    return f"MUT-HB-{timezone.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
+class HostelListView(generics.ListAPIView):
+    """GET /api/hostels/?category=boys|girls"""
+
+    serializer_class = HostelListSerializer
+
+    def get_queryset(self):
+        qs = Hostel.objects.filter(is_active=True)
+        category = self.request.query_params.get("category")
+        if category in (Hostel.CATEGORY_BOYS, Hostel.CATEGORY_GIRLS):
+            qs = qs.filter(category=category)
+        return qs
 
 
-class Booking(models.Model):
-    STATUS_PENDING_PAYMENT = "pending_payment"
-    STATUS_PAID = "paid"
-    STATUS_CANCELLED = "cancelled"
-    STATUS_EXPIRED = "expired"
-    STATUS_CHOICES = [
-        (STATUS_PENDING_PAYMENT, "Pending Payment"),
-        (STATUS_PAID, "Paid"),
-        (STATUS_CANCELLED, "Cancelled"),
-        (STATUS_EXPIRED, "Expired"),
-    ]
+class HostelDetailView(generics.RetrieveAPIView):
+    """GET /api/hostels/<id>/ - includes rooms and live bed availability."""
 
-    booking_reference = models.CharField(max_length=30, unique=True, default=generate_booking_reference, editable=False)
+    queryset = Hostel.objects.filter(is_active=True)
+    serializer_class = HostelDetailSerializer
 
-    # Student details
-    full_name = models.CharField(max_length=200, help_text="Full name as per KCSE certificate")
-    registration_number = models.CharField(max_length=50)
-    email = models.EmailField()
-    phone_number = models.CharField(max_length=20, help_text="Phone number that will be charged via M-Pesa")
 
-    is_minor = models.BooleanField(default=False)
-    id_number = models.CharField(max_length=20, blank=True, help_text="National ID number, required if 18 or older")
-    birth_certificate_number = models.CharField(
-        max_length=30, blank=True, help_text="Birth certificate number, required if under 18"
-    )
+class RoomDetailView(generics.RetrieveAPIView):
+    """GET /api/rooms/<id>/ - a single room with its beds (bus-seat style selection)."""
 
-    # Hostel selection
-    hostel = models.ForeignKey(Hostel, related_name="bookings", on_delete=models.PROTECT)
-    room = models.ForeignKey(Room, related_name="bookings", on_delete=models.PROTECT)
+    queryset = Room.objects.filter(is_active=True)
+    serializer_class = RoomSerializer
 
-    # NOTE: This was previously a OneToOneField, which put a permanent unique
-    # constraint on `bed` at the DB level. That meant once a single Booking row
-    # was created for a bed (even one that later expired or was cancelled),
-    # no booking could ever be created for that bed again -> permanent 400s.
-    # It's now a ForeignKey so a bed can accumulate a history of bookings
-    # (expired/cancelled/paid), and "only one *active* booking per bed" is
-    # enforced instead via the conditional UniqueConstraint below.
-    bed = models.ForeignKey(Bed, related_name="bookings", on_delete=models.PROTECT)
 
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING_PAYMENT)
+class BookingCreateView(generics.CreateAPIView):
+    """
+    POST /api/bookings/
+    Creates a booking in `pending_payment` state and refreshes the hold on the
+    selected bed so no other student can select it while this one is paying.
+    """
 
-    receipt_number = models.CharField(max_length=40, blank=True)
-    qr_code = models.ImageField(upload_to=qr_code_path, blank=True, null=True)
-    receipt_email_sent = models.BooleanField(default=False)
+    serializer_class = BookingCreateSerializer
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    paid_at = models.DateTimeField(blank=True, null=True)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        booking = serializer.save()
+        output = BookingSerializer(booking, context={"request": request})
+        return Response(output.data, status=status.HTTP_201_CREATED)
 
-    class Meta:
-        ordering = ["-created_at"]
-        constraints = [
-            # Only one *active* (pending_payment or paid) booking allowed per
-            # bed at a time. Expired/cancelled bookings are excluded, so they
-            # don't permanently block the bed from being booked again.
-            models.UniqueConstraint(
-                fields=["bed"],
-                condition=models.Q(status__in=["pending_payment", "paid"]),
-                name="one_active_booking_per_bed",
+
+class BookingDetailView(generics.RetrieveAPIView):
+    """GET /api/bookings/<id>/ - used by the frontend to poll payment status."""
+
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+    lookup_field = "pk"
+
+
+class InitiateSTKPushView(APIView):
+    """POST /api/payments/stk-push/  {booking_id, phone_number}"""
+
+    def post(self, request):
+        serializer = STKPushRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        booking_id = serializer.validated_data["booking_id"]
+        phone_number = serializer.validated_data["phone_number"]
+
+        booking = get_object_or_404(Booking, pk=booking_id)
+
+        booking.bed.release_if_expired()
+        if booking.status != Booking.STATUS_PENDING_PAYMENT:
+            return Response(
+                {"detail": "This booking is no longer awaiting payment."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        ]
+        if booking.bed.status != Bed.STATUS_PENDING:
+            return Response(
+                {"detail": "The hold on this bed has expired. Please select a bed again."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-    def __str__(self):
-        return f"{self.booking_reference} - {self.full_name}"
+        client = MpesaClient()
+        try:
+            data = client.stk_push(
+                phone_number=phone_number,
+                amount=booking.amount,
+                account_reference=booking.booking_reference,
+                transaction_desc=f"MUT Hostel Booking {booking.booking_reference}",
+            )
+        except MpesaError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
 
-    def mark_paid(self, mpesa_receipt_number=None):
-        self.status = self.STATUS_PAID
-        self.paid_at = timezone.now()
-        self.receipt_number = mpesa_receipt_number or self.booking_reference
-        self.save(update_fields=["status", "paid_at", "receipt_number", "updated_at"])
-        self.bed.confirm_booked()
+        MpesaTransaction.objects.update_or_create(
+            booking=booking,
+            defaults={
+                "phone_number": phone_number,
+                "amount": booking.amount,
+                "merchant_request_id": data.get("MerchantRequestID", ""),
+                "checkout_request_id": data.get("CheckoutRequestID", ""),
+                "status": MpesaTransaction.STATUS_PENDING,
+                "result_desc": data.get("CustomerMessage", ""),
+            },
+        )
+
+        return Response(
+            {
+                "detail": "STK push sent. Enter your M-Pesa PIN on your phone to complete payment.",
+                "checkout_request_id": data.get("CheckoutRequestID"),
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
-class MpesaTransaction(models.Model):
-    STATUS_PENDING = "pending"
-    STATUS_SUCCESS = "success"
-    STATUS_FAILED = "failed"
-    STATUS_CANCELLED = "cancelled"
-    STATUS_CHOICES = [
-        (STATUS_PENDING, "Pending"),
-        (STATUS_SUCCESS, "Success"),
-        (STATUS_FAILED, "Failed"),
-        (STATUS_CANCELLED, "Cancelled by user"),
-    ]
+class MpesaCallbackView(APIView):
+    """
+    POST /api/payments/mpesa/callback/
+    Public endpoint that Safaricom Daraja calls once the STK push has been
+    accepted, declined, or timed out on the customer's phone.
+    """
 
-    booking = models.OneToOneField(Booking, related_name="mpesa_transaction", on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=20)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    authentication_classes = []
+    permission_classes = []
 
-    merchant_request_id = models.CharField(max_length=100, blank=True)
-    checkout_request_id = models.CharField(max_length=100, blank=True, db_index=True)
+    def post(self, request):
+        body = request.data.get("Body", {})
+        callback = body.get("stkCallback", {})
+        checkout_request_id = callback.get("CheckoutRequestID")
+        result_code = callback.get("ResultCode")
+        result_desc = callback.get("ResultDesc", "")
 
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDING)
-    result_code = models.CharField(max_length=10, blank=True)
-    result_desc = models.CharField(max_length=255, blank=True)
-    mpesa_receipt_number = models.CharField(max_length=50, blank=True)
-    transaction_date = models.CharField(max_length=20, blank=True)
+        if not checkout_request_id:
+            logger.warning("M-Pesa callback missing CheckoutRequestID: %s", request.data)
+            return Response({"ResultCode": 0, "ResultDesc": "Accepted"})
 
-    raw_callback = models.JSONField(blank=True, null=True)
+        try:
+            transaction = MpesaTransaction.objects.select_related("booking", "booking__bed").get(
+                checkout_request_id=checkout_request_id
+            )
+        except MpesaTransaction.DoesNotExist:
+            logger.warning("No matching MpesaTransaction for %s", checkout_request_id)
+            return Response({"ResultCode": 0, "ResultDesc": "Accepted"})
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+        transaction.raw_callback = request.data
+        transaction.result_code = str(result_code)
+        transaction.result_desc = result_desc
 
-    def __str__(self):
-        return f"{self.checkout_request_id or 'N/A'} - {self.status}"
+        if str(result_code) == "0":
+            metadata_items = callback.get("CallbackMetadata", {}).get("Item", [])
+            metadata = {item.get("Name"): item.get("Value") for item in metadata_items}
+
+            transaction.status = MpesaTransaction.STATUS_SUCCESS
+            transaction.mpesa_receipt_number = metadata.get("MpesaReceiptNumber", "")
+            transaction.transaction_date = str(metadata.get("TransactionDate", ""))
+            transaction.save()
+
+            booking = transaction.booking
+            booking.mark_paid(mpesa_receipt_number=transaction.mpesa_receipt_number)
+
+            generate_qr_code(booking)
+            send_receipt_email(booking)
+        else:
+            transaction.status = (
+                MpesaTransaction.STATUS_CANCELLED if str(result_code) == "1032" else MpesaTransaction.STATUS_FAILED
+            )
+            transaction.save()
+
+            booking = transaction.booking
+            booking.status = Booking.STATUS_CANCELLED
+            booking.save(update_fields=["status", "updated_at"])
+            booking.bed.release()
+
+        return Response({"ResultCode": 0, "ResultDesc": "Accepted"})
+
+
+class BookingStatusView(APIView):
+    """GET /api/bookings/<id>/status/ - lightweight polling endpoint for the frontend."""
+
+    def get(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        booking.bed.release_if_expired()
+        data = {
+            "booking_status": booking.status,
+            "bed_status": booking.bed.status,
+        }
+        if hasattr(booking, "mpesa_transaction"):
+            data["mpesa_status"] = booking.mpesa_transaction.status
+            data["mpesa_result_desc"] = booking.mpesa_transaction.result_desc
+        return Response(data)
+
+
+class ReceiptDownloadView(APIView):
+    """GET /api/bookings/<id>/receipt/ - downloads the PDF receipt for a paid booking."""
+
+    def get(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        if booking.status != Booking.STATUS_PAID:
+            return Response({"detail": "Receipt is only available once payment is confirmed."}, status=400)
+
+        buffer = build_receipt_pdf(booking)
+        response = FileResponse(
+            buffer, as_attachment=True, filename=f"{booking.booking_reference}_receipt.pdf"
+        )
+        return response
