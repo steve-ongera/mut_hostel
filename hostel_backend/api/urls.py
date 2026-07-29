@@ -1,4 +1,3 @@
-#api/urls.py (app level url )
 from django.urls import path
 
 from . import views
@@ -10,6 +9,10 @@ urlpatterns = [
     path("hostels/", views.HostelListView.as_view(), name="hostel-list"),
     path("hostels/<int:pk>/", views.HostelDetailView.as_view(), name="hostel-detail"),
     path("rooms/<int:pk>/", views.RoomDetailView.as_view(), name="room-detail"),
+
+    # Beds (selection / temporary hold)
+    path("beds/<int:pk>/", views.BedDetailView.as_view(), name="bed-detail"),
+    path("beds/<int:pk>/hold/", views.BedHoldView.as_view(), name="bed-hold"),
 
     # Bookings
     path("bookings/", views.BookingCreateView.as_view(), name="booking-create"),

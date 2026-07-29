@@ -73,6 +73,25 @@ export const downloadReceipt = (bookingId) =>
     .get(`/bookings/${bookingId}/receipt/`, { responseType: "blob" })
     .then((res) => res.data);
 
+
+
+// ---------------------------------------------------------------------
+// Beds (temporary hold while a student fills out the booking form)
+// GET    /api/beds/<id>/          - bed + hostel + room + live countdown
+// POST   /api/beds/<id>/hold/     - lock the bed for 5 minutes
+// DELETE /api/beds/<id>/hold/     - release the hold early
+// ---------------------------------------------------------------------
+export const getBedDetail = (bedId) =>
+  api.get(`/beds/${bedId}/`).then((res) => res.data);
+
+export const holdBed = (bedId) =>
+  api.post(`/beds/${bedId}/hold/`).then((res) => res.data);
+
+export const releaseBedHold = (bedId) =>
+  api.delete(`/beds/${bedId}/hold/`).then((res) => res.data).catch(() => {});
+// releaseBedHold is best-effort (e.g. called on unmount) so failures are swallowed
+
+
 // ---------------------------------------------------------------------
 // Payments (M-Pesa Daraja)
 // POST /api/payments/stk-push/   { booking_id, phone_number }

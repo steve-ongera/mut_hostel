@@ -28,7 +28,7 @@ export default function About() {
           <div className="row">
             <div className="col-lg-6 col-sm-12 col-xs-12">
               <div className="ab_img">
-                <img src="/assets/img/about1.png" className="img-fluid" alt="About Muranga University Hostels" />
+                <img src="/assets/img/about.jpg" className="img-fluid" alt="About Muranga University Hostels" />
               </div>
             </div>
             <div className="col-lg-6 col-sm-12 col-xs-12">

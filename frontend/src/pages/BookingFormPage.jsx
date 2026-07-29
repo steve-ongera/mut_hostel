@@ -1,17 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getHostels, createBooking, extractErrorMessages } from "../services/api";
+import { holdBed, releaseBedHold, createBooking, extractErrorMessages } from "../services/api";
+
+function formatMMSS(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
 
 export default function BookingFormPage() {
   const { bedId } = useParams();
   const navigate = useNavigate();
+  const submittedRef = useRef(false);
+
+  const [bedInfo, setBedInfo] = useState(null);
+  const [holding, setHolding] = useState(true);
+  const [holdError, setHoldError] = useState(null);
+
+  const [secondsLeft, setSecondsLeft] = useState(null);
+  const [expired, setExpired] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [hostels, setHostels] = useState([]);
-  const [selectedHostel, setSelectedHostel] = useState("");
-  const [selectedRoom, setSelectedRoom] = useState("");
-  const [rooms, setRooms] = useState([]);
-  const [beds, setBeds] = useState([]);
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -21,70 +31,86 @@ export default function BookingFormPage() {
     is_minor: false,
     id_number: "",
     birth_certificate_number: "",
-    hostel: "",
-    room: "",
-    bed: bedId || ""
   });
 
-  // Load hostels for dropdown
+  // ---- Lock the bed for this student the moment they land on this page ----
   useEffect(() => {
-    getHostels()
-      .then(data => setHostels(data))
-      .catch(err => console.error("Error loading hostels:", err));
-  }, []);
+    let isMounted = true;
+    setHolding(true);
+    setHoldError(null);
 
-  // When hostel changes, load its rooms
-  useEffect(() => {
-    if (formData.hostel) {
-      const hostel = hostels.find(h => h.id === parseInt(formData.hostel));
-      if (hostel && hostel.rooms) {
-        setRooms(hostel.rooms);
-      } else {
-        setRooms([]);
-      }
-    }
-  }, [formData.hostel, hostels]);
+    holdBed(bedId)
+      .then((data) => {
+        if (isMounted) setBedInfo(data);
+      })
+      .catch((err) => {
+        if (isMounted) setHoldError(extractErrorMessages(err).join(" "));
+      })
+      .finally(() => {
+        if (isMounted) setHolding(false);
+      });
 
-  // When room changes, load its beds
+    return () => {
+      isMounted = false;
+    };
+  }, [bedId]);
+
+  // ---- Release the hold automatically if the student leaves without booking ----
   useEffect(() => {
-    if (formData.room && formData.hostel) {
-      const hostel = hostels.find(h => h.id === parseInt(formData.hostel));
-      if (hostel && hostel.rooms) {
-        const room = hostel.rooms.find(r => r.id === parseInt(formData.room));
-        if (room && room.beds) {
-          setBeds(room.beds.filter(b => b.is_available));
-        } else {
-          setBeds([]);
-        }
+    return () => {
+      if (!submittedRef.current) {
+        releaseBedHold(bedId);
       }
-    }
-  }, [formData.room, formData.hostel, hostels]);
+    };
+  }, [bedId]);
+
+  // ---- Live countdown, driven by the backend's hold_expires_at ----
+  useEffect(() => {
+    if (!bedInfo?.hold_expires_at || expired) return;
+
+    const expiresAt = new Date(bedInfo.hold_expires_at).getTime();
+    let intervalId;
+
+    const tick = () => {
+      const diff = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
+      setSecondsLeft(diff);
+      if (diff <= 0) {
+        clearInterval(intervalId);
+        setExpired(true);
+      }
+    };
+
+    tick();
+    intervalId = setInterval(tick, 1000);
+    return () => clearInterval(intervalId);
+  }, [bedInfo, expired]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
     setError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!bedInfo) return;
+
     setLoading(true);
     setError(null);
 
     try {
       const payload = {
         ...formData,
-        hostel: parseInt(formData.hostel),
-        room: parseInt(formData.room),
-        bed: parseInt(formData.bed)
+        hostel: bedInfo.hostel_id,
+        room: bedInfo.room_id,
+        bed: bedInfo.id,
       };
 
       const response = await createBooking(payload);
-      
-      // Navigate to payment page
+      submittedRef.current = true; // don't release the hold on unmount, we're moving to payment
       navigate(`/booking/${response.id}/pay`);
     } catch (err) {
       const messages = extractErrorMessages(err);
@@ -92,6 +118,54 @@ export default function BookingFormPage() {
       setLoading(false);
     }
   };
+
+  // ---- Still locking the bed on the backend ----
+  if (holding) {
+    return (
+      <section className="section-padding">
+        <div className="container text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-3">Reserving your bed...</p>
+        </div>
+      </section>
+    );
+  }
+
+  // ---- Bed couldn't be held (already booked, doesn't exist, etc.) ----
+  if (holdError) {
+    return (
+      <section className="section-padding">
+        <div className="container">
+          <div className="alert alert-danger d-flex align-items-center">
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            {holdError}
+          </div>
+          <Link to="/hostels" className="btn_one">
+            <i className="bi bi-arrow-left me-2"></i> Back to Hostels
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  // ---- Hold expired while filling out the form ----
+  if (expired) {
+    return (
+      <section className="section-padding">
+        <div className="container">
+          <div className="alert alert-warning d-flex align-items-center">
+            <i className="bi bi-clock-history me-2"></i>
+            Your 5-minute hold on this bed has expired. Please select a bed again.
+          </div>
+          <Link to="/hostels" className="btn_one">
+            <i className="bi bi-arrow-left me-2"></i> Back to Hostels
+          </Link>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -118,19 +192,20 @@ export default function BookingFormPage() {
       <section className="ab_area section-padding">
         <div className="container">
           <div className="row">
-            <div className="col-lg-8 offset-lg-2">
+            {/* ---- Form (left) ---- */}
+            <div className="col-lg-8">
               <div className="single_course" style={{ padding: "40px" }}>
-                <div className="section-title text-center">
+                <div className="section-title">
                   <h2>
                     <i className="bi bi-clipboard-check me-2" style={{ color: "#525fe1" }}></i>
                     Student Registration
                   </h2>
-                  <p>Please fill in your details to book a bed. Your bed will be held for 10 minutes while you complete payment.</p>
+                  <p>Please fill in your details to book a bed.</p>
                 </div>
 
                 {error && (
                   <div className="alert alert-danger d-flex align-items-center" style={{ whiteSpace: "pre-line" }}>
-                    <i className="bi bi-exclamation-triangle-fill me-2"></i> 
+                    <i className="bi bi-exclamation-triangle-fill me-2"></i>
                     <span>{error}</span>
                   </div>
                 )}
@@ -270,85 +345,9 @@ export default function BookingFormPage() {
                       </div>
                     )}
 
-                    <div className="col-md-12">
-                      <div className="form-group" style={{ marginBottom: "20px" }}>
-                        <label style={{ fontWeight: "600" }}>
-                          <i className="bi bi-building me-1" style={{ color: "#525fe1" }}></i>
-                          Select Hostel *
-                        </label>
-                        <select
-                          name="hostel"
-                          value={formData.hostel}
-                          onChange={handleChange}
-                          className="form-control"
-                          style={{ height: "50px", borderRadius: "5px" }}
-                          required
-                        >
-                          <option value="">-- Select Hostel --</option>
-                          {hostels.map(hostel => (
-                            <option key={hostel.id} value={hostel.id}>
-                              {hostel.name} ({hostel.category}) - KES {Number(hostel.fee_amount).toLocaleString()}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {formData.hostel && (
-                      <div className="col-md-6">
-                        <div className="form-group" style={{ marginBottom: "20px" }}>
-                          <label style={{ fontWeight: "600" }}>
-                            <i className="bi bi-door-open me-1" style={{ color: "#525fe1" }}></i>
-                            Select Room *
-                          </label>
-                          <select
-                            name="room"
-                            value={formData.room}
-                            onChange={handleChange}
-                            className="form-control"
-                            style={{ height: "50px", borderRadius: "5px" }}
-                            required
-                          >
-                            <option value="">-- Select Room --</option>
-                            {rooms.map(room => (
-                              <option key={room.id} value={room.id}>
-                                Room {room.room_number} ({room.available_beds_count || 0} beds available)
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    )}
-
-                    {formData.room && beds.length > 0 && (
-                      <div className="col-md-6">
-                        <div className="form-group" style={{ marginBottom: "20px" }}>
-                          <label style={{ fontWeight: "600" }}>
-                            <i className="bi bi-circle me-1" style={{ color: "#525fe1" }}></i>
-                            Select Bed *
-                          </label>
-                          <select
-                            name="bed"
-                            value={formData.bed}
-                            onChange={handleChange}
-                            className="form-control"
-                            style={{ height: "50px", borderRadius: "5px" }}
-                            required
-                          >
-                            <option value="">-- Select Bed --</option>
-                            {beds.map(bed => (
-                              <option key={bed.id} value={bed.id}>
-                                Bed {bed.bed_number} {bed.id === parseInt(bedId) ? "⭐ (Recommended)" : ""}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="col-md-12 text-center" style={{ marginTop: "20px" }}>
-                      <button 
-                        type="submit" 
+                    <div className="col-md-12" style={{ marginTop: "10px" }}>
+                      <button
+                        type="submit"
                         className="btn_one"
                         disabled={loading}
                         style={{
@@ -357,7 +356,7 @@ export default function BookingFormPage() {
                           cursor: loading ? "not-allowed" : "pointer",
                           display: "inline-flex",
                           alignItems: "center",
-                          gap: "8px"
+                          gap: "8px",
                         }}
                       >
                         {loading ? (
@@ -376,6 +375,111 @@ export default function BookingFormPage() {
                     </div>
                   </div>
                 </form>
+              </div>
+            </div>
+
+            {/* ---- Selection summary + countdown (right sidebar) ---- */}
+            <div className="col-lg-4">
+              <div
+                style={{
+                  background: "#fff",
+                  border: "1px solid #e8e8e9",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  position: "sticky",
+                  top: "20px",
+                }}
+              >
+                <h3
+                  style={{
+                    background: "#0b104a",
+                    color: "#fff",
+                    padding: "15px 20px",
+                    fontSize: "18px",
+                    fontWeight: "600",
+                    margin: 0,
+                  }}
+                >
+                  <i className="bi bi-bookmark-check me-2"></i> Your Selection
+                </h3>
+
+                <div style={{ padding: "20px" }}>
+                  {secondsLeft !== null && (
+                    <div
+                      style={{
+                        background: secondsLeft <= 60 ? "#fef2f2" : "#eff6ff",
+                        border: `1px solid ${secondsLeft <= 60 ? "#fecaca" : "#bfdbfe"}`,
+                        borderRadius: "6px",
+                        padding: "12px 15px",
+                        marginBottom: "20px",
+                        textAlign: "center",
+                      }}
+                    >
+                      <div style={{ fontSize: "12px", color: "#6c757d", marginBottom: "4px" }}>
+                        <i className="bi bi-clock me-1"></i> Bed held for
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "24px",
+                          fontWeight: "700",
+                          color: secondsLeft <= 60 ? "#dc2626" : "#0b104a",
+                        }}
+                      >
+                        {formatMMSS(secondsLeft)}
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={{ padding: "10px 0", borderBottom: "1px solid #f0f0f0" }}>
+                    <span style={{ display: "block", fontSize: "13px", color: "#6c757d", marginBottom: "4px" }}>
+                      <i className="bi bi-building me-1"></i> Hostel
+                    </span>
+                    <span style={{ fontWeight: "600" }}>{bedInfo?.hostel_name}</span>
+                  </div>
+
+                  <div style={{ padding: "10px 0", borderBottom: "1px solid #f0f0f0" }}>
+                    <span style={{ display: "block", fontSize: "13px", color: "#6c757d", marginBottom: "4px" }}>
+                      <i className="bi bi-door-open me-1"></i> Room
+                    </span>
+                    <span style={{ fontWeight: "600" }}>{bedInfo?.room_number}</span>
+                  </div>
+
+                  <div style={{ padding: "10px 0", borderBottom: "1px solid #f0f0f0" }}>
+                    <span style={{ display: "block", fontSize: "13px", color: "#6c757d", marginBottom: "4px" }}>
+                      <i className="bi bi-circle me-1"></i> Bed
+                    </span>
+                    <span style={{ fontWeight: "600" }}>{bedInfo?.bed_number}</span>
+                  </div>
+
+                  {bedInfo?.fee_amount != null && (
+                    <div style={{ padding: "10px 0" }}>
+                      <span style={{ display: "block", fontSize: "13px", color: "#6c757d", marginBottom: "4px" }}>
+                        <i className="bi bi-currency-dollar me-1"></i> Fee
+                      </span>
+                      <span style={{ fontWeight: "700", fontSize: "18px", color: "#0b104a" }}>
+                        KES {Number(bedInfo.fee_amount).toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+
+                  <Link
+                    to="/hostels"
+                    className="btn_one"
+                    style={{
+                      width: "100%",
+                      marginTop: "15px",
+                      textAlign: "center",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      background: "#6c757d",
+                      borderColor: "#6c757d",
+                    }}
+                  >
+                    <i className="bi bi-arrow-left-right"></i> Change Selection
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

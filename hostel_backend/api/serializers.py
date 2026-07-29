@@ -4,6 +4,45 @@ from rest_framework import serializers
 
 from .models import Hostel, Room, Bed, Booking, MpesaTransaction
 
+class BedHoldSerializer(serializers.ModelSerializer):
+    """Full bed context (hostel + room + fee) plus live hold countdown, used by
+    the booking flow so the frontend never needs router state to know what
+    the student picked — it can always re-fetch this from the backend."""
+
+    hostel_id = serializers.IntegerField(source="room.hostel.id", read_only=True)
+    hostel_name = serializers.CharField(source="room.hostel.name", read_only=True)
+    fee_amount = serializers.DecimalField(
+        source="room.hostel.fee_amount", max_digits=10, decimal_places=2, read_only=True
+    )
+    room_id = serializers.IntegerField(source="room.id", read_only=True)
+    room_number = serializers.CharField(source="room.room_number", read_only=True)
+    is_available = serializers.SerializerMethodField()
+    seconds_remaining = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Bed
+        fields = [
+            "id",
+            "bed_number",
+            "status",
+            "hold_expires_at",
+            "room_id",
+            "room_number",
+            "hostel_id",
+            "hostel_name",
+            "fee_amount",
+            "is_available",
+            "seconds_remaining",
+        ]
+
+    def get_is_available(self, obj):
+        return obj.status == Bed.STATUS_AVAILABLE
+
+    def get_seconds_remaining(self, obj):
+        if obj.status == Bed.STATUS_PENDING and obj.hold_expires_at:
+            remaining = (obj.hold_expires_at - timezone.now()).total_seconds()
+            return max(0, int(remaining))
+        return None
 
 class BedSerializer(serializers.ModelSerializer):
     is_available = serializers.SerializerMethodField()
@@ -114,7 +153,7 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         hostel = validated_data["hostel"]
         validated_data["amount"] = hostel.fee_amount
         booking = Booking.objects.create(**validated_data)
-        bed.hold(minutes=10)
+        bed.hold()  # refreshes the hold to a full 5 minutes at submission time
         return booking
 
 

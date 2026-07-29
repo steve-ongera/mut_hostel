@@ -81,6 +81,63 @@ class Bed(models.Model):
         (STATUS_BOOKED, "Booked"),
     ]
 
+    HOLD_DURATION_MINUTES = 5  # how long a selected bed stays locked for one student
+
+    room = models.ForeignKey(Room, related_name="beds", on_delete=models.CASCADE)
+    bed_number = models.CharField(max_length=10)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_AVAILABLE)
+    hold_expires_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["room", "bed_number"]
+        unique_together = ("room", "bed_number")
+
+    def __str__(self):
+        return f"{self.room} - Bed {self.bed_number}"
+
+    def is_effectively_available(self):
+        if self.status == self.STATUS_AVAILABLE:
+            return True
+        if self.status == self.STATUS_PENDING and self.hold_expires_at and self.hold_expires_at < timezone.now():
+            return True
+        return False
+
+    def release_if_expired(self):
+        if self.status == self.STATUS_PENDING and self.hold_expires_at and self.hold_expires_at < timezone.now():
+            self.status = self.STATUS_AVAILABLE
+            self.hold_expires_at = None
+            self.save(update_fields=["status", "hold_expires_at", "updated_at"])
+            Booking.objects.filter(bed=self, status=Booking.STATUS_PENDING_PAYMENT).update(
+                status=Booking.STATUS_EXPIRED
+            )
+            return True
+        return False
+
+    def hold(self, minutes=None):
+        minutes = minutes or self.HOLD_DURATION_MINUTES
+        self.status = self.STATUS_PENDING
+        self.hold_expires_at = timezone.now() + timedelta(minutes=minutes)
+        self.save(update_fields=["status", "hold_expires_at", "updated_at"])
+
+    def confirm_booked(self):
+        self.status = self.STATUS_BOOKED
+        self.hold_expires_at = None
+        self.save(update_fields=["status", "hold_expires_at", "updated_at"])
+
+    def release(self):
+        self.status = self.STATUS_AVAILABLE
+        self.hold_expires_at = None
+        self.save(update_fields=["status", "hold_expires_at", "updated_at"])
+    STATUS_AVAILABLE = "available"
+    STATUS_PENDING = "pending"
+    STATUS_BOOKED = "booked"
+    STATUS_CHOICES = [
+        (STATUS_AVAILABLE, "Available"),
+        (STATUS_PENDING, "Pending Payment"),
+        (STATUS_BOOKED, "Booked"),
+    ]
+
     room = models.ForeignKey(Room, related_name="beds", on_delete=models.CASCADE)
     bed_number = models.CharField(max_length=10)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_AVAILABLE)

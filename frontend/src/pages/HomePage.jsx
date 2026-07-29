@@ -66,7 +66,7 @@ export default function HomePage() {
             {/* END COL */}
             <div className="col-lg-6 col-sm-12 col-xs-12">
               <div className="hero-text-img">
-                <img src="/assets/img/home-img2.png" className="img-fluid" alt="Student moving into hostel" />
+                <img src="/assets/img/hero_image.png" className="img-fluid" alt="Student moving into hostel" />
                 <div className="home_ps">
                   <div className="icon-box">
                     <i className="bi bi-people-fill"></i>
@@ -336,7 +336,7 @@ export default function HomePage() {
               data-wow-offset="0"
             >
               <div className="ab_img">
-                <img src="/assets/img/about1.png" className="img-fluid" alt="Muranga University hostel" />
+                <img src="/assets/img/about.jpg" className="img-fluid" alt="Muranga University hostel" />
               </div>
             </div>
             {/* END COL */}
@@ -616,7 +616,7 @@ export default function HomePage() {
               <div
                 className="video-area"
                 style={{
-                  backgroundImage: "url(/assets/img/bg/video.jpg)",
+                  backgroundImage: "url(/assets/img/bg/video.png)",
                   backgroundSize: "cover",
                   backgroundPosition: "center center",
                 }}
@@ -852,7 +852,7 @@ export default function HomePage() {
               data-wow-offset="0"
             >
               <div className="ab_img">
-                <img src="/assets/img/about3.png" className="img-fluid" alt="Booking on a laptop" />
+                <img src="/assets/img/about3.jpg" className="img-fluid" alt="Booking on a laptop" />
                 <div className="home_ps2">
                   <div className="icon-box">
                     <i className="bi bi-book"></i>
@@ -883,7 +883,7 @@ export default function HomePage() {
           <div className="row">
             <div className="col-lg-6 col-sm-12 col-xs-12">
               <div className="ab_img">
-                <img src="/assets/img/review.png" className="img-fluid" alt="Student review" />
+                <img src="/assets/img/about4.jpg" className="img-fluid" alt="Student review" />
               </div>
             </div>
             {/* END COL */}
