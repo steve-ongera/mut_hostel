@@ -53,27 +53,45 @@ export default function Navbar() {
   }, [mobileOpen]);
 
   return (
-    <div 
-      id="navigation" 
+    <div
+      id="navigation"
       className={`navbar-light bg-faded site-navigation ${isScrolled ? "navbar-fixed" : ""}`}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 999,
+        background: isScrolled ? "#ffffff" : "transparent",
+        boxShadow: isScrolled ? "0 2px 20px rgba(0,0,0,0.08)" : "none",
+        transition: "all 0.3s ease",
+        padding: isScrolled ? "10px 20px" : "20px 30px",
+        borderBottom: isScrolled ? "1px solid #eee" : "none",
+      }}
     >
       <div className="container-fluid">
-        <div className="row align-items-center">
-          {/* Logo - 20% width */}
-          <div className="col-20 align-self-center">
+        <div className="navbar-row">
+          {/* Logo - Left */}
+          <div className="navbar-logo-col">
             <div className="site-logo">
               <Link to="/">
-                <img 
-                  src="/assets/img/logo.png" 
-                  alt="Muranga University Hostel Booking" 
-                  className="img-fluid"
+                <img
+                  src="/assets/img/mut_logo2.png"
+                  alt="Muranga University Hostel Booking"
+                  style={{
+                    height: "50px",
+                    width: "auto",
+                    maxHeight: "50px",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
                 />
               </Link>
             </div>
           </div>
 
-          {/* Main Navigation - 60% width */}
-          <div className="col-60 d-none d-xl-block">
+          {/* Desktop Navigation - Center */}
+          <div className="desktop-nav">
             <nav id="main-menu">
               <ul>
                 <li>
@@ -84,7 +102,7 @@ export default function Navbar() {
                 </li>
                 <li className="menu-item-has-children">
                   <Link to="/hostels">Hostels</Link>
-                  <ul>
+                  <ul className="dropdown-menu">
                     <li>
                       <Link to="/hostels?category=boys">
                         <i className="bi bi-person me-1"></i> Boys Hostels
@@ -110,128 +128,265 @@ export default function Navbar() {
             </nav>
           </div>
 
-          {/* CTA Button - 20% width */}
-          <div className="col-20 d-none d-xl-block text-end align-self-center">
-            <Link to="/hostels" className="btn_one">
+          {/* Desktop CTA Button and Hamburger - Right */}
+          <div className="navbar-actions">
+            <Link to="/hostels" className="btn_one desktop-cta">
               <i className="bi bi-calendar-check me-2"></i> Book Now
             </Link>
-          </div>
 
-          {/* Mobile Menu Overlay */}
-          {mobileOpen && (
-            <div 
-              className="mobile-overlay" 
-              onClick={() => setMobileOpen(false)}
-              style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                background: "rgba(0,0,0,0.5)",
-                zIndex: 9998,
-                transition: "opacity 0.3s ease"
+            {/* Hamburger Menu Button - Always visible, positioned at the end */}
+            <button
+              type="button"
+              id="sm_menu_ham"
+              aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMobileOpen(!mobileOpen);
               }}
-            />
-          )}
+              className={mobileOpen ? "active" : ""}
+            >
+              <i className={`bi ${mobileOpen ? "bi-x-lg" : "bi-list"}`}></i>
+            </button>
+          </div>
+        </div>
+      </div>
 
-          {/* Mobile Menu */}
-          <ul className={`mobile_menu ${mobileOpen ? "show" : ""}`}>
-            <li className="mobile-menu-header">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <img 
-                  src="/assets/img/logo-light.png" 
-                  alt="Logo" 
-                  style={{ height: "40px" }}
-                />
-                <button 
-                  type="button" 
-                  className="close-menu"
-                  onClick={() => setMobileOpen(false)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#fff",
-                    fontSize: "28px",
-                    cursor: "pointer"
-                  }}
-                >
-                  <i className="bi bi-x-circle"></i>
-                </button>
-              </div>
-            </li>
+      {/* Mobile Menu Overlay */}
+      {mobileOpen && (
+        <div
+          className="mobile-overlay"
+          onClick={() => setMobileOpen(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0, 0, 0, 0.5)",
+            zIndex: 9998,
+            opacity: mobileOpen ? 1 : 0,
+            transition: "opacity 0.3s ease",
+          }}
+        />
+      )}
+
+      {/* Mobile Menu - Slides from right */}
+      <ul
+        className={`mobile_menu ${mobileOpen ? "show" : ""}`}
+        style={{
+          position: "fixed",
+          top: 0,
+          right: mobileOpen ? "0" : "-320px",
+          width: "300px",
+          maxWidth: "85%",
+          height: "100%",
+          background: "#0b104a",
+          zIndex: 9999,
+          padding: "80px 25px 30px",
+          overflowY: "auto",
+          transition: "right 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          boxShadow: "-10px 0 30px rgba(0,0,0,0.2)",
+          listStyle: "none",
+          margin: 0,
+        }}
+      >
+        <li className="mobile-menu-header" style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "20px", marginBottom: "20px" }}>
+          <div className="d-flex justify-content-between align-items-center">
+            <img
+              src="/assets/img/mut_logo2.png"
+              alt="Logo"
+              style={{ height: "35px", width: "auto", objectFit: "contain" }}
+            />
+            <button
+              type="button"
+              className="close-menu"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close menu"
+              style={{
+                background: "none",
+                border: "none",
+                color: "#fff",
+                fontSize: "28px",
+                cursor: "pointer",
+                padding: "4px",
+                lineHeight: 1,
+                transition: "transform 0.3s ease",
+              }}
+            >
+              <i className="bi bi-x-circle"></i>
+            </button>
+          </div>
+        </li>
+        <li style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <Link
+            to="/"
+            onClick={() => setMobileOpen(false)}
+            style={{
+              display: "block",
+              color: "#fff",
+              padding: "14px 0",
+              fontSize: "16px",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              transition: "all 0.2s ease",
+              textDecoration: "none",
+            }}
+          >
+            Home
+          </Link>
+        </li>
+        <li style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <Link
+            to="/about"
+            onClick={() => setMobileOpen(false)}
+            style={{
+              display: "block",
+              color: "#fff",
+              padding: "14px 0",
+              fontSize: "16px",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              transition: "all 0.2s ease",
+              textDecoration: "none",
+            }}
+          >
+            About
+          </Link>
+        </li>
+        <li style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <Link
+            to="/hostels"
+            onClick={() => setMobileOpen(false)}
+            style={{
+              display: "block",
+              color: "#fff",
+              padding: "14px 0",
+              fontSize: "16px",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              transition: "all 0.2s ease",
+              textDecoration: "none",
+            }}
+          >
+            Hostels
+          </Link>
+          <ul className="sub-menu" style={{ paddingLeft: "20px", marginTop: "5px", listStyle: "none" }}>
             <li>
-              <Link to="/" onClick={() => setMobileOpen(false)}>
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link to="/about" onClick={() => setMobileOpen(false)}>
-                About
-              </Link>
-            </li>
-            <li>
-              <Link to="/hostels" onClick={() => setMobileOpen(false)}>
-                Hostels
-              </Link>
-              <ul className="sub-menu">
-                <li>
-                  <Link to="/hostels?category=boys" onClick={() => setMobileOpen(false)}>
-                    <i className="bi bi-person me-2"></i> Boys Hostels
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/hostels?category=girls" onClick={() => setMobileOpen(false)}>
-                    <i className="bi bi-person-female me-2"></i> Girls Hostels
-                  </Link>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <Link to="/hostels" onClick={() => setMobileOpen(false)}>
-                Book a Bed
-              </Link>
-            </li>
-            <li>
-              <Link to="/bookings/lookup" onClick={() => setMobileOpen(false)}>
-                Track Booking
-              </Link>
-            </li>
-            <li>
-              <Link to="/contact" onClick={() => setMobileOpen(false)}>
-                Contact
-              </Link>
-            </li>
-            <li className="mobile-cta">
-              <Link 
-                to="/hostels" 
+              <Link
+                to="/hostels?category=boys"
                 onClick={() => setMobileOpen(false)}
-                className="btn_one"
                 style={{
                   display: "block",
-                  textAlign: "center",
-                  marginTop: "20px"
+                  color: "#a8b0d0",
+                  padding: "8px 0",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  textTransform: "none",
+                  transition: "all 0.2s ease",
+                  textDecoration: "none",
                 }}
               >
-                <i className="bi bi-calendar-check me-2"></i> Book Now
+                <i className="bi bi-person me-2"></i> Boys Hostels
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/hostels?category=girls"
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  display: "block",
+                  color: "#a8b0d0",
+                  padding: "8px 0",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  textTransform: "none",
+                  transition: "all 0.2s ease",
+                  textDecoration: "none",
+                }}
+              >
+                <i className="bi bi-person-female me-2"></i> Girls Hostels
               </Link>
             </li>
           </ul>
-
-          {/* Hamburger Menu Button */}
-          <button
-            type="button"
-            id="sm_menu_ham"
-            aria-label="Toggle menu"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className={mobileOpen ? "active" : ""}
+        </li>
+        <li style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <Link
+            to="/hostels"
+            onClick={() => setMobileOpen(false)}
+            style={{
+              display: "block",
+              color: "#fff",
+              padding: "14px 0",
+              fontSize: "16px",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              transition: "all 0.2s ease",
+              textDecoration: "none",
+            }}
           >
-            <i className={`bi ${mobileOpen ? "bi-x-lg" : "bi-list"}`}></i>
-          </button>
-        </div>
-        {/* END ROW */}
-      </div>
-      {/* END CONTAINER */}
+            Book a Bed
+          </Link>
+        </li>
+        <li style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <Link
+            to="/bookings/lookup"
+            onClick={() => setMobileOpen(false)}
+            style={{
+              display: "block",
+              color: "#fff",
+              padding: "14px 0",
+              fontSize: "16px",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              transition: "all 0.2s ease",
+              textDecoration: "none",
+            }}
+          >
+            Track Booking
+          </Link>
+        </li>
+        <li style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <Link
+            to="/contact"
+            onClick={() => setMobileOpen(false)}
+            style={{
+              display: "block",
+              color: "#fff",
+              padding: "14px 0",
+              fontSize: "16px",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              transition: "all 0.2s ease",
+              textDecoration: "none",
+            }}
+          >
+            Contact
+          </Link>
+        </li>
+        <li className="mobile-cta" style={{ marginTop: "30px" }}>
+          <Link
+            to="/hostels"
+            onClick={() => setMobileOpen(false)}
+            className="btn_one mobile-cta-btn"
+            style={{
+              display: "block",
+              textAlign: "center",
+              background: "#525fe1",
+              color: "#fff",
+              padding: "14px 30px",
+              borderRadius: "5px",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              transition: "all 0.3s ease",
+              textDecoration: "none",
+              border: "1px solid #525fe1",
+            }}
+          >
+            <i className="bi bi-calendar-check me-2"></i> Book Now
+          </Link>
+        </li>
+      </ul>
     </div>
   );
 }

@@ -11,7 +11,17 @@ export default function Footer() {
             <div className="col-lg-3 col-sm-6 col-xs-12">
               <div className="single_footer">
                 <Link to="/">
-                  <img src="/assets/img/logo.png" alt="Muranga University Hostel Booking" />
+                  <img 
+                    src="/assets/img/mut_logo2.png" 
+                    alt="Muranga University Hostel Booking"
+                    style={{ 
+                      height: "50px", 
+                      width: "auto",
+                      maxHeight: "50px",
+                      objectFit: "contain",
+                      marginBottom: "20px"
+                    }}
+                  />
                 </Link>
                 <p>
                   The official online platform for booking, paying for and managing student
@@ -21,22 +31,22 @@ export default function Footer() {
                   <ul>
                     <li>
                       <a className="f_facebook" href="#">
-                        <i className="fa-brands fa-facebook-f"></i>
+                        <i className="bi bi-facebook"></i>
                       </a>
                     </li>
                     <li>
                       <a className="f_twitter" href="#">
-                        <i className="fa-solid fa-x"></i>
+                        <i className="bi bi-twitter-x"></i>
                       </a>
                     </li>
                     <li>
                       <a className="f_instagram" href="#">
-                        <i className="fa-brands fa-instagram"></i>
+                        <i className="bi bi-instagram"></i>
                       </a>
                     </li>
                     <li>
                       <a className="f_linkedin" href="#">
-                        <i className="fa-brands fa-linkedin-in"></i>
+                        <i className="bi bi-linkedin"></i>
                       </a>
                     </li>
                   </ul>
@@ -97,21 +107,17 @@ export default function Footer() {
               <div className="single_footer">
                 <h4>Contact Info</h4>
                 <div className="sf_contact">
-                  <span className="ti-map"></span>
                   <p>Muranga University of Technology, Muranga, Kenya</p>
                 </div>
                 <div className="sf_contact">
-                  <span className="ti-mobile"></span>
                   <p>+254 700 000 000</p>
                 </div>
                 <div className="sf_contact">
-                  <span className="ti-mobile"></span>
                   <p>
                     <a href="tel:+254700000000">Chat with the Hostel Office</a>
                   </p>
                 </div>
                 <div className="sf_contact">
-                  <span className="ti-email"></span>
                   <p>hostels@mut.ac.ke</p>
                 </div>
               </div>

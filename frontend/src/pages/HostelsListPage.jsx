@@ -45,9 +45,9 @@ export default function HostelsListPage() {
             <div className="col-lg-12">
               <div className="section-top-title">
                 <h1>Our Hostels</h1>
-                <ul>
-                  <li><Link to="/">Home</Link> <span className="separator">/</span></li>
-                  <li>Hostels</li>
+                <ul className="breadcrumb-list">
+                  <li><Link to="/">Home</Link></li>
+                  <li className="active">Hostels</li>
                 </ul>
               </div>
             </div>
@@ -57,17 +57,42 @@ export default function HostelsListPage() {
       {/* END SECTION TOP */}
 
       {/* START CATEGORY FILTER */}
-      <section className="top_cat__area section-padding" style={{ paddingTop: "40px" }}>
+      <section className="top_cat__area" style={{ paddingTop: "40px", paddingBottom: "0" }}>
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
-              <div className="cat_list" style={{ marginBottom: "40px" }}>
+              <div className="cat_list_hostel" style={{ marginBottom: "40px" }}>
                 <ul>
                   <li>
                     <button 
                       onClick={() => handleCategoryChange("all")}
-                      className={`btn ${activeCategory === "all" ? "btn_one" : "btn-outline-primary"}`}
-                      style={{ borderRadius: "30px", padding: "10px 30px", margin: "0 5px" }}
+                      className={activeCategory === "all" ? "btn_one" : "btn-outline-primary"}
+                      style={{ 
+                        borderRadius: "30px", 
+                        padding: "10px 30px", 
+                        margin: "0 5px",
+                        background: activeCategory === "all" ? "#525fe1" : "transparent",
+                        color: activeCategory === "all" ? "#fff" : "#0b104a",
+                        border: activeCategory === "all" ? "1px solid #525fe1" : "1px solid #ddd",
+                        transition: "all 0.3s ease",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                        fontSize: "16px"
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeCategory !== "all") {
+                          e.target.style.background = "#525fe1";
+                          e.target.style.color = "#fff";
+                          e.target.style.borderColor = "#525fe1";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeCategory !== "all") {
+                          e.target.style.background = "transparent";
+                          e.target.style.color = "#0b104a";
+                          e.target.style.borderColor = "#ddd";
+                        }
+                      }}
                     >
                       <i className="bi bi-grid-3x3-gap-fill me-2"></i>
                       All Hostels
@@ -76,8 +101,33 @@ export default function HostelsListPage() {
                   <li>
                     <button 
                       onClick={() => handleCategoryChange("boys")}
-                      className={`btn ${activeCategory === "boys" ? "btn_one" : "btn-outline-primary"}`}
-                      style={{ borderRadius: "30px", padding: "10px 30px", margin: "0 5px" }}
+                      className={activeCategory === "boys" ? "btn_one" : "btn-outline-primary"}
+                      style={{ 
+                        borderRadius: "30px", 
+                        padding: "10px 30px", 
+                        margin: "0 5px",
+                        background: activeCategory === "boys" ? "#525fe1" : "transparent",
+                        color: activeCategory === "boys" ? "#fff" : "#0b104a",
+                        border: activeCategory === "boys" ? "1px solid #525fe1" : "1px solid #ddd",
+                        transition: "all 0.3s ease",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                        fontSize: "16px"
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeCategory !== "boys") {
+                          e.target.style.background = "#525fe1";
+                          e.target.style.color = "#fff";
+                          e.target.style.borderColor = "#525fe1";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeCategory !== "boys") {
+                          e.target.style.background = "transparent";
+                          e.target.style.color = "#0b104a";
+                          e.target.style.borderColor = "#ddd";
+                        }
+                      }}
                     >
                       <i className="bi bi-person-fill me-2"></i>
                       Boys Hostels
@@ -86,10 +136,35 @@ export default function HostelsListPage() {
                   <li>
                     <button 
                       onClick={() => handleCategoryChange("girls")}
-                      className={`btn ${activeCategory === "girls" ? "btn_one" : "btn-outline-primary"}`}
-                      style={{ borderRadius: "30px", padding: "10px 30px", margin: "0 5px" }}
+                      className={activeCategory === "girls" ? "btn_one" : "btn-outline-primary"}
+                      style={{ 
+                        borderRadius: "30px", 
+                        padding: "10px 30px", 
+                        margin: "0 5px",
+                        background: activeCategory === "girls" ? "#525fe1" : "transparent",
+                        color: activeCategory === "girls" ? "#fff" : "#0b104a",
+                        border: activeCategory === "girls" ? "1px solid #525fe1" : "1px solid #ddd",
+                        transition: "all 0.3s ease",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                        fontSize: "16px"
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeCategory !== "girls") {
+                          e.target.style.background = "#525fe1";
+                          e.target.style.color = "#fff";
+                          e.target.style.borderColor = "#525fe1";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeCategory !== "girls") {
+                          e.target.style.background = "transparent";
+                          e.target.style.color = "#0b104a";
+                          e.target.style.borderColor = "#ddd";
+                        }
+                      }}
                     >
-                      <i className="bi bi-person-fill me-2" style={{ color: "#e83e8c" }}></i>
+                      <i className="bi bi-person-fill me-2" style={{ color: activeCategory === "girls" ? "#fff" : "#e83e8c" }}></i>
                       Girls Hostels
                     </button>
                   </li>
@@ -106,7 +181,7 @@ export default function HostelsListPage() {
         <div className="container">
           <div className="row">
             <div className="col-lg-8 col-sm-6 col-xs-12">
-              <div className="section-title">
+              <div className="section-title" style={{ marginBottom: "30px" }}>
                 <h2>
                   <b>{hostels.length}</b> Hostels Available
                   {activeCategory !== "all" && (
@@ -118,7 +193,7 @@ export default function HostelsListPage() {
               </div>
             </div>
             <div className="col-lg-4 col-sm-6 col-xs-12">
-              <div className="cour_btn" style={{ marginTop: "0" }}>
+              <div className="cour_btn" style={{ marginTop: "0", float: "right" }}>
                 <Link to="/" className="btn_one">
                   <i className="bi bi-arrow-left me-2"></i> Back to Home
                 </Link>
@@ -127,68 +202,129 @@ export default function HostelsListPage() {
           </div>
 
           <div className="row">
+            {/* Loading State */}
             {loading && (
               <div className="col-12 text-center" style={{ padding: "60px 0" }}>
-                <div className="spinner-border text-primary" role="status">
+                <div className="spinner-border text-primary" role="status" style={{ width: "50px", height: "50px" }}>
                   <span className="visually-hidden">Loading...</span>
                 </div>
-                <p className="mt-3">Loading hostels...</p>
+                <p className="mt-3" style={{ fontWeight: "500" }}>Loading hostels...</p>
               </div>
             )}
             
+            {/* Error State */}
             {error && (
               <div className="col-12">
-                <div className="alert alert-danger d-flex align-items-center">
-                  <i className="bi bi-exclamation-triangle-fill me-2"></i> 
+                <div className="alert alert-danger d-flex align-items-center" style={{ 
+                  padding: "15px 20px", 
+                  borderRadius: "8px",
+                  border: "1px solid #f5c6cb",
+                  background: "#f8d7da",
+                  color: "#721c24"
+                }}>
+                  <i className="bi bi-exclamation-triangle-fill me-2" style={{ fontSize: "20px" }}></i> 
                   {error}
                 </div>
               </div>
             )}
             
+            {/* Empty State */}
             {!loading && !error && hostels.length === 0 && (
               <div className="col-12 text-center" style={{ padding: "60px 0" }}>
-                <i className="bi bi-building" style={{ fontSize: "48px", color: "#ccc", display: "block", marginBottom: "20px" }}></i>
-                <h3>No hostels available</h3>
-                <p>Please check back later for available accommodations.</p>
+                <i className="bi bi-building" style={{ 
+                  fontSize: "64px", 
+                  color: "#ccc", 
+                  display: "block", 
+                  marginBottom: "20px" 
+                }}></i>
+                <h3 style={{ fontWeight: "600", marginBottom: "10px" }}>No hostels available</h3>
+                <p style={{ color: "#6c757d" }}>Please check back later for available accommodations.</p>
               </div>
             )}
 
+            {/* Hostels Grid */}
             {hostels.map((hostel) => (
-              <div className="col-lg-4 col-sm-6 col-xs-12" key={hostel.id}>
+              <div className="col-lg-4 col-md-6 col-sm-6 col-xs-12" key={hostel.id}>
                 <div className="single_course">
-                  <div className="single_c_img">
+                  {/* Hostel Image with uniform sizing */}
+                  <div className="hostel-card-image">
                     <img
                       src={resolveMediaUrl(hostel.image) || "/assets/img/course/1.png"}
                       className="img-fluid"
                       alt={hostel.name}
                     />
-                    <span>{hostel.category === "boys" ? "Boys" : "Girls"}</span>
+                    <span style={{
+                      position: "absolute",
+                      bottom: "10px",
+                      left: "10px",
+                      background: hostel.category === "boys" ? "#525fe1" : "#e83e8c",
+                      color: "#fff",
+                      padding: "4px 15px",
+                      borderRadius: "20px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                      transform: "none"
+                    }}>
+                      {hostel.category === "boys" ? "Boys" : "Girls"}
+                    </span>
                   </div>
-                  <h4>
-                    <Link to={`/hostels/${hostel.id}`}>{hostel.name}</Link>
+                  
+                  <h4 style={{ padding: "20px 20px 10px", marginBottom: "5px" }}>
+                    <Link to={`/hostels/${hostel.id}`} style={{ 
+                      fontWeight: "600",
+                      fontSize: "20px",
+                      lineHeight: "28px"
+                    }}>
+                      {hostel.name}
+                    </Link>
                   </h4>
-                  <p>
-                    <i className="bi bi-person me-1"></i> 
-                    {hostel.available_beds || 0} / {hostel.total_beds || 0} beds available
-                  </p>
-                  {hostel.location_notes && (
-                    <p>
-                      <i className="bi bi-geo-alt me-1"></i> {hostel.location_notes}
+                  
+                  <div style={{ padding: "0 20px" }}>
+                    <p style={{ marginBottom: "5px" }}>
+                      <i className="bi bi-person me-1" style={{ color: "#525fe1" }}></i> 
+                      <span style={{ fontWeight: "600" }}>{hostel.available_beds || 0}</span> / {hostel.total_beds || 0} beds available
                     </p>
-                  )}
-                 
-                  <div className="price">
-                    KES {Number(hostel.fee_amount).toLocaleString()}
-                    <br />
-                    <small style={{ fontSize: "14px", fontWeight: "400" }}>per bed</small>
+                    {hostel.location_notes && (
+                      <p style={{ marginBottom: "5px" }}>
+                        <i className="bi bi-geo-alt me-1" style={{ color: "#525fe1" }}></i> 
+                        {hostel.location_notes}
+                      </p>
+                    )}
                   </div>
-                  <Link 
-                    to={`/hostels/${hostel.id}`}
-                    className="btn_one"
-                    style={{ display: "inline-block", marginBottom: "20px" }}
-                  >
-                    View Details <i className="bi bi-arrow-right ms-2"></i>
-                  </Link>
+                 
+                  <div className="price" style={{ 
+                    padding: "15px 20px",
+                    marginTop: "15px",
+                    borderTop: "1px solid #e8e8e9",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}>
+                    <div>
+                      <span style={{ 
+                        fontSize: "22px", 
+                        fontWeight: "700", 
+                        color: "#525fe1"
+                      }}>
+                        KES {Number(hostel.fee_amount).toLocaleString()}
+                      </span>
+                      <br />
+                      <small style={{ fontSize: "13px", fontWeight: "400", color: "#6c757d" }}>per bed</small>
+                    </div>
+                    <Link 
+                      to={`/hostels/${hostel.id}`}
+                      className="btn_one"
+                      style={{ 
+                        padding: "8px 20px",
+                        fontSize: "14px",
+                        borderRadius: "6px"
+                      }}
+                    >
+                      View <i className="bi bi-arrow-right ms-1"></i>
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

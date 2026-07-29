@@ -3,14 +3,10 @@ from django.contrib import admin
 from .models import Hostel, Room, Bed, Booking, MpesaTransaction
 
 
-class RoomInline(admin.TabularInline):
-    model = Room
-    extra = 0
-
-
 class BedInline(admin.TabularInline):
     model = Bed
     extra = 0
+
 
 
 @admin.register(Hostel)
@@ -18,7 +14,11 @@ class HostelAdmin(admin.ModelAdmin):
     list_display = ("name", "category", "fee_amount", "total_beds", "available_beds", "is_active")
     list_filter = ("category", "is_active")
     search_fields = ("name",)
-    inlines = [RoomInline]
+    # NOTE: no RoomInline here on purpose. A hostel can have hundreds of rooms
+    # (e.g. 380), and rendering that many as inline forms on one page blows
+    # past Django's DATA_UPLOAD_MAX_NUMBER_FIELDS limit on save, raising
+    # TooManyFieldsSent. Browse/manage rooms via the Room admin list below,
+    # which is filterable by hostel, instead.
 
 
 @admin.register(Room)
@@ -26,7 +26,7 @@ class RoomAdmin(admin.ModelAdmin):
     list_display = ("room_number", "hostel", "floor", "capacity", "available_beds_count", "is_active")
     list_filter = ("hostel", "is_active")
     search_fields = ("room_number", "hostel__name")
-    inlines = [BedInline]
+    inlines = [BedInline]  # fine at this scale: only ~4 beds per room
 
 
 @admin.register(Bed)

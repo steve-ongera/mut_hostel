@@ -40,29 +40,27 @@ export default function HomePage() {
             <div className="col-lg-6 col-sm-12 col-xs-12">
               <div className="hero-text ht_top">
                 <h1>
-                  <span>Smart Stay</span> Where Comfort Meets Campus
+                  Muranga University Hostel Booking
                 </h1>
                 <p>
                   Book your Muranga University hostel bed in minutes, pay securely with M-Pesa,
                   and get an instant e-receipt with a scannable QR code.
                 </p>
               </div>
-              <div className="home_sb">
-                <form
-                  className="banner_subs"
-                  onSubmit={(e) => e.preventDefault()}
-                  action="/hostels"
-                >
-                  <input
-                    type="text"
-                    className="form-control home_si"
-                    placeholder="Search hostels, e.g. Block A, Boys Hostel"
-                    required
-                  />
-                  <button type="submit" className="subscribe__btn">
-                    Search <i className="bi bi-arrow-right ms-2"></i>
-                  </button>
-                </form>
+              {/* REPLACED SEARCH WITH VIEW HOSTELS BUTTON */}
+              <div style={{ marginTop: "30px" }}>
+                <Link to="/hostels" className="btn_one" style={{ 
+                  padding: "15px 40px", 
+                  fontSize: "18px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRadius: "3px"
+                }}>
+                  <i className="bi bi-building"></i>
+                  View All Hostels
+                  <i className="bi bi-arrow-right"></i>
+                </Link>
               </div>
             </div>
             {/* END COL */}
@@ -88,55 +86,141 @@ export default function HomePage() {
       </section>
       {/* END HOME */}
 
-      {/* START COUNTER */}
+      {/* START COUNTER - UPDATED WITH BOOTSTRAP ICONS */}
       <section className="count_area counter_feature">
         <div className="container">
           <div className="row">
             <div className="col-lg-3 col-sm-6 col-xs-12">
-              <div className="single-counter">
-                <div className="icon-box sc_one">
+              <div className="single-counter" style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                padding: "20px 25px",
+                borderRadius: "12px",
+                background: "#fff",
+                boxShadow: "0 2px 15px rgba(0,0,0,0.06)",
+                border: "1px solid #f0f0f0"
+              }}>
+                <div style={{
+                  width: "55px",
+                  height: "55px",
+                  minWidth: "55px",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#eef0ff",
+                  color: "#525fe1",
+                  fontSize: "24px",
+                  marginRight: "15px"
+                }}>
                   <i className="bi bi-building"></i>
                 </div>
-                <div className="counter-content">
-                  <h2 className="counter-num">{hostels.length || "—"}</h2>
-                  <p>Hostels Listed</p>
+                <div>
+                  <h2 style={{ fontSize: "28px", fontWeight: "700", margin: 0, color: "#0b104a" }}>
+                    {hostels.length || "—"}
+                  </h2>
+                  <p style={{ margin: 0, fontSize: "14px", color: "#6c757d" }}>Hostels Listed</p>
                 </div>
               </div>
             </div>
+            {/* END COL */}
+            
             <div className="col-lg-3 col-sm-6 col-xs-12">
-              <div className="single-counter">
-                <div className="icon-box sc_two">
+              <div className="single-counter" style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                padding: "20px 25px",
+                borderRadius: "12px",
+                background: "#fff",
+                boxShadow: "0 2px 15px rgba(0,0,0,0.06)",
+                border: "1px solid #f0f0f0"
+              }}>
+                <div style={{
+                  width: "55px",
+                  height: "55px",
+                  minWidth: "55px",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#e8f5e9",
+                  color: "#4caf50",
+                  fontSize: "24px",
+                  marginRight: "15px"
+                }}>
                   <i className="bi bi-bed-fill"></i>
                 </div>
-                <div className="counter-content">
-                  <h2 className="counter-num">
+                <div>
+                  <h2 style={{ fontSize: "28px", fontWeight: "700", margin: 0, color: "#0b104a" }}>
                     {hostels.reduce((sum, h) => sum + (h.available_beds || 0), 0) || "—"}
                   </h2>
-                  <p>Beds Available Now</p>
+                  <p style={{ margin: 0, fontSize: "14px", color: "#6c757d" }}>Beds Available</p>
                 </div>
               </div>
             </div>
             {/* END COL */}
+            
             <div className="col-lg-3 col-sm-6 col-xs-12">
-              <div className="single-counter">
-                <div className="icon-box sc_three">
+              <div className="single-counter" style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                padding: "20px 25px",
+                borderRadius: "12px",
+                background: "#fff",
+                boxShadow: "0 2px 15px rgba(0,0,0,0.06)",
+                border: "1px solid #f0f0f0"
+              }}>
+                <div style={{
+                  width: "55px",
+                  height: "55px",
+                  minWidth: "55px",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#fff3e0",
+                  color: "#ff9800",
+                  fontSize: "24px",
+                  marginRight: "15px"
+                }}>
                   <i className="bi bi-clock-fill"></i>
                 </div>
-                <div className="counter-content">
-                  <h2 className="counter-num">10 Min</h2>
-                  <p>Bed Hold While You Pay</p>
+                <div>
+                  <h2 style={{ fontSize: "28px", fontWeight: "700", margin: 0, color: "#0b104a" }}>10 Min</h2>
+                  <p style={{ margin: 0, fontSize: "14px", color: "#6c757d" }}>Bed Hold Time</p>
                 </div>
               </div>
             </div>
             {/* END COL */}
+            
             <div className="col-lg-3 col-sm-6 col-xs-12">
-              <div className="single-counter">
-                <div className="icon-box sc_four">
+              <div className="single-counter" style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                padding: "20px 25px",
+                borderRadius: "12px",
+                background: "#fff",
+                boxShadow: "0 2px 15px rgba(0,0,0,0.06)",
+                border: "1px solid #f0f0f0"
+              }}>
+                <div style={{
+                  width: "55px",
+                  height: "55px",
+                  minWidth: "55px",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#e3f2fd",
+                  color: "#2196f3",
+                  fontSize: "24px",
+                  marginRight: "15px"
+                }}>
                   <i className="bi bi-phone-fill"></i>
                 </div>
-                <div className="counter-content">
-                  <h2 className="counter-num">M-Pesa</h2>
-                  <p>Instant Secure Payment</p>
+                <div>
+                  <h2 style={{ fontSize: "28px", fontWeight: "700", margin: 0, color: "#0b104a" }}>M-Pesa</h2>
+                  <p style={{ margin: 0, fontSize: "14px", color: "#6c757d" }}>Secure Payment</p>
                 </div>
               </div>
             </div>
@@ -361,12 +445,12 @@ export default function HomePage() {
       </section>
       {/* END CATEGORY */}
 
-      {/* START HOSTELS (live listing, was "course" section) */}
+      {/* START HOSTELS */}
       <section className="home_course section-padding">
         <div className="container">
           <div className="row">
             <div className="col-lg-8 col-sm-6 col-xs-12">
-              <div className="section-title">
+              <div className="section-title" style={{ marginBottom: "20px" }}>
                 <h2>
                   Browse <b>{hostels.length || ""} </b> <br />
                   Hostels With Live Availability
@@ -375,7 +459,7 @@ export default function HomePage() {
             </div>
             {/* END COL */}
             <div className="col-lg-4 col-sm-6 col-xs-12">
-              <div className="cour_btn">
+              <div className="cour_btn" style={{ marginTop: "0", float: "right" }}>
                 <Link to="/hostels" className="btn_one">
                   View all Hostels <i className="bi bi-arrow-right ms-2"></i>
                 </Link>
@@ -387,44 +471,128 @@ export default function HomePage() {
 
           <div className="row">
             {loading && (
-              <div className="col-12">
-                <p>Loading hostels…</p>
+              <div className="col-12 text-center" style={{ padding: "40px 0" }}>
+                <div className="spinner-border text-primary" role="status" style={{ width: "40px", height: "40px" }}>
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3" style={{ color: "#6c757d" }}>Loading hostels…</p>
               </div>
             )}
+            
             {error && (
               <div className="col-12">
-                <p>Could not load hostels right now: {error}</p>
+                <div className="alert alert-danger d-flex align-items-center" style={{ 
+                  padding: "12px 16px", 
+                  borderRadius: "6px",
+                  border: "1px solid #f5c6cb",
+                  background: "#f8d7da",
+                  color: "#721c24"
+                }}>
+                  <i className="bi bi-exclamation-triangle-fill me-2"></i> 
+                  {error}
+                </div>
               </div>
             )}
+            
             {!loading && !error && hostels.length === 0 && (
-              <div className="col-12">
-                <p>No hostels are published yet - check back soon.</p>
+              <div className="col-12 text-center" style={{ padding: "40px 0" }}>
+                <i className="bi bi-building" style={{ fontSize: "48px", color: "#ccc", display: "block", marginBottom: "15px" }}></i>
+                <p style={{ color: "#6c757d" }}>No hostels are published yet - check back soon.</p>
               </div>
             )}
+            
             {hostels.slice(0, 6).map((hostel) => (
-              <div className="col-lg-4 col-sm-6 col-xs-12" key={hostel.id}>
+              <div className="col-lg-4 col-md-6 col-sm-6 col-xs-12" key={hostel.id}>
                 <div className="single_course">
-                  <div className="single_c_img">
+                  {/* Hostel Image with uniform sizing */}
+                  <div className="hostel-card-image">
                     <img
                       src={resolveMediaUrl(hostel.image) || "/assets/img/course/1.png"}
                       className="img-fluid"
                       alt={hostel.name}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover"
+                      }}
                     />
-                    <span>{hostel.category === "boys" ? "Boys Hostel" : "Girls Hostel"}</span>
+                    <span style={{
+                      position: "absolute",
+                      bottom: "10px",
+                      left: "10px",
+                      background: "#525fe1",
+                      color: "#fff",
+                      padding: "3px 14px",
+                      borderRadius: "20px",
+                      fontSize: "11px",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px"
+                    }}>
+                      {hostel.category === "boys" ? "Boys" : "Girls"}
+                    </span>
                   </div>
-                  <h4>
-                    <Link to={`/hostels/${hostel.id}`}>{hostel.name}</Link>
+                  
+                  <h4 style={{ padding: "18px 20px 8px", marginBottom: "5px" }}>
+                    <Link to={`/hostels/${hostel.id}`} style={{ 
+                      fontWeight: "600",
+                      fontSize: "19px",
+                      lineHeight: "26px",
+                      color: "#0b104a"
+                    }}>
+                      {hostel.name}
+                    </Link>
                   </h4>
-                  <p>
-                    <i className="bi bi-person me-1"></i> {hostel.available_beds} / {hostel.total_beds}{" "}
-                    beds available
-                  </p>
-                  {hostel.location_notes && (
-                    <p>
-                      <i className="bi bi-geo-alt me-1"></i> {hostel.location_notes}
+                  
+                  <div style={{ padding: "0 20px" }}>
+                    <p style={{ marginBottom: "4px", fontSize: "14px", color: "#4a5355" }}>
+                      <i className="bi bi-person me-1" style={{ color: "#6c757d" }}></i> 
+                      <span style={{ fontWeight: "500" }}>{hostel.available_beds || 0}</span> / {hostel.total_beds || 0} beds available
                     </p>
-                  )}
-                  <div className="price">Fee - KES {hostel.fee_amount}</div>
+                    {hostel.location_notes && (
+                      <p style={{ marginBottom: "4px", fontSize: "14px", color: "#4a5355" }}>
+                        <i className="bi bi-geo-alt me-1" style={{ color: "#6c757d" }}></i> 
+                        {hostel.location_notes}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="price" style={{ 
+                    padding: "12px 20px",
+                    marginTop: "12px",
+                    borderTop: "1px solid #e8e8e9",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}>
+                    <div>
+                      <span style={{ 
+                        fontSize: "20px", 
+                        fontWeight: "700", 
+                        color: "#0b104a"
+                      }}>
+                        KES {Number(hostel.fee_amount).toLocaleString()}
+                      </span>
+                      <br />
+                      <small style={{ fontSize: "12px", fontWeight: "400", color: "#6c757d" }}>per bed</small>
+                    </div>
+                    <Link 
+                      to={`/hostels/${hostel.id}`}
+                      className="btn_one"
+                      style={{ 
+                        padding: "6px 18px",
+                        fontSize: "13px",
+                        borderRadius: "4px",
+                        background: "#0b104a",
+                        borderColor: "#0b104a",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px"
+                      }}
+                    >
+                      View Details <i className="bi bi-arrow-right"></i>
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}
