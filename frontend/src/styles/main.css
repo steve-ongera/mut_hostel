@@ -2876,3 +2876,80 @@ font-weight: 700;
 * 19.END MOBILE MENU
 * ----------------------------------------------------------------------------------------
 */
+
+/* Bed Selection Styles */
+.bed-available:hover {
+    background: #e8ecff !important;
+    border-color: #525fe1 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(82, 95, 225, 0.15);
+}
+
+.bed-selected {
+    background: #525fe1 !important;
+    color: #fff !important;
+    border-color: #525fe1 !important;
+    box-shadow: 0 4px 12px rgba(82, 95, 225, 0.3);
+}
+
+.bed-unavailable {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+}
+
+/* Alert Styles */
+.alert-success {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+    border-radius: 8px;
+}
+
+/* Course Features List */
+.course_features ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.course_features ul li:last-child {
+    border-bottom: none;
+}
+
+/* Breadcrumb Styles */
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-list li {
+  display: flex;
+  align-items: center;
+  color: #0b104a;
+  font-size: 15px;
+}
+
+.breadcrumb-list li:not(:last-child)::after {
+  content: "/";
+  margin-left: 8px;
+  color: #999;
+}
+
+.breadcrumb-list li a {
+  color: #525fe1;
+  transition: color 0.2s;
+}
+
+.breadcrumb-list li a:hover {
+  color: #f26b65;
+  text-decoration: underline;
+}
+
+.breadcrumb-list li.active {
+  color: #4a5355;
+  font-weight: 500;
+}

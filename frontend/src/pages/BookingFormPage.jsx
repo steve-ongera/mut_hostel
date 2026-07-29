@@ -103,8 +103,8 @@ export default function BookingFormPage() {
               <div className="section-top-title">
                 <h1>Book Your Bed</h1>
                 <ul>
-                  <li><Link to="/">Home</Link> /</li>
-                  <li><Link to="/hostels">Hostels</Link> /</li>
+                  <li><Link to="/">Home</Link> <span className="separator">/</span></li>
+                  <li><Link to="/hostels">Hostels</Link> <span className="separator">/</span></li>
                   <li>Booking Form</li>
                 </ul>
               </div>
@@ -121,13 +121,17 @@ export default function BookingFormPage() {
             <div className="col-lg-8 offset-lg-2">
               <div className="single_course" style={{ padding: "40px" }}>
                 <div className="section-title text-center">
-                  <h2>Student Registration</h2>
+                  <h2>
+                    <i className="bi bi-clipboard-check me-2" style={{ color: "#525fe1" }}></i>
+                    Student Registration
+                  </h2>
                   <p>Please fill in your details to book a bed. Your bed will be held for 10 minutes while you complete payment.</p>
                 </div>
 
                 {error && (
-                  <div className="alert alert-danger" style={{ whiteSpace: "pre-line" }}>
-                    <i className="ti-alert"></i> {error}
+                  <div className="alert alert-danger d-flex align-items-center" style={{ whiteSpace: "pre-line" }}>
+                    <i className="bi bi-exclamation-triangle-fill me-2"></i> 
+                    <span>{error}</span>
                   </div>
                 )}
 
@@ -135,7 +139,10 @@ export default function BookingFormPage() {
                   <div className="row">
                     <div className="col-md-12">
                       <div className="form-group" style={{ marginBottom: "20px" }}>
-                        <label style={{ fontWeight: "600" }}>Full Name (as per KCSE certificate) *</label>
+                        <label style={{ fontWeight: "600" }}>
+                          <i className="bi bi-person me-1" style={{ color: "#525fe1" }}></i>
+                          Full Name (as per KCSE certificate) *
+                        </label>
                         <input
                           type="text"
                           name="full_name"
@@ -150,7 +157,10 @@ export default function BookingFormPage() {
 
                     <div className="col-md-6">
                       <div className="form-group" style={{ marginBottom: "20px" }}>
-                        <label style={{ fontWeight: "600" }}>Registration Number *</label>
+                        <label style={{ fontWeight: "600" }}>
+                          <i className="bi bi-card-text me-1" style={{ color: "#525fe1" }}></i>
+                          Registration Number *
+                        </label>
                         <input
                           type="text"
                           name="registration_number"
@@ -165,7 +175,10 @@ export default function BookingFormPage() {
 
                     <div className="col-md-6">
                       <div className="form-group" style={{ marginBottom: "20px" }}>
-                        <label style={{ fontWeight: "600" }}>Email *</label>
+                        <label style={{ fontWeight: "600" }}>
+                          <i className="bi bi-envelope me-1" style={{ color: "#525fe1" }}></i>
+                          Email *
+                        </label>
                         <input
                           type="email"
                           name="email"
@@ -180,7 +193,10 @@ export default function BookingFormPage() {
 
                     <div className="col-md-12">
                       <div className="form-group" style={{ marginBottom: "20px" }}>
-                        <label style={{ fontWeight: "600" }}>Phone Number (for M-Pesa) *</label>
+                        <label style={{ fontWeight: "600" }}>
+                          <i className="bi bi-phone me-1" style={{ color: "#525fe1" }}></i>
+                          Phone Number (for M-Pesa) *
+                        </label>
                         <input
                           type="tel"
                           name="phone_number"
@@ -191,7 +207,10 @@ export default function BookingFormPage() {
                           style={{ height: "50px", borderRadius: "5px" }}
                           required
                         />
-                        <small style={{ color: "#666" }}>Format: 0712345678 (Safaricom number)</small>
+                        <small style={{ color: "#666" }}>
+                          <i className="bi bi-info-circle me-1"></i>
+                          Format: 0712345678 (Safaricom number)
+                        </small>
                       </div>
                     </div>
 
@@ -205,6 +224,7 @@ export default function BookingFormPage() {
                             onChange={handleChange}
                             style={{ marginRight: "10px" }}
                           />
+                          <i className="bi bi-person-check me-1" style={{ color: "#525fe1" }}></i>
                           I am under 18 years old
                         </label>
                       </div>
@@ -213,7 +233,10 @@ export default function BookingFormPage() {
                     {!formData.is_minor ? (
                       <div className="col-md-12">
                         <div className="form-group" style={{ marginBottom: "20px" }}>
-                          <label style={{ fontWeight: "600" }}>National ID Number *</label>
+                          <label style={{ fontWeight: "600" }}>
+                            <i className="bi bi-card-id me-1" style={{ color: "#525fe1" }}></i>
+                            National ID Number *
+                          </label>
                           <input
                             type="text"
                             name="id_number"
@@ -229,7 +252,10 @@ export default function BookingFormPage() {
                     ) : (
                       <div className="col-md-12">
                         <div className="form-group" style={{ marginBottom: "20px" }}>
-                          <label style={{ fontWeight: "600" }}>Birth Certificate Number *</label>
+                          <label style={{ fontWeight: "600" }}>
+                            <i className="bi bi-file-earmark-text me-1" style={{ color: "#525fe1" }}></i>
+                            Birth Certificate Number *
+                          </label>
                           <input
                             type="text"
                             name="birth_certificate_number"
@@ -246,7 +272,10 @@ export default function BookingFormPage() {
 
                     <div className="col-md-12">
                       <div className="form-group" style={{ marginBottom: "20px" }}>
-                        <label style={{ fontWeight: "600" }}>Select Hostel *</label>
+                        <label style={{ fontWeight: "600" }}>
+                          <i className="bi bi-building me-1" style={{ color: "#525fe1" }}></i>
+                          Select Hostel *
+                        </label>
                         <select
                           name="hostel"
                           value={formData.hostel}
@@ -268,7 +297,10 @@ export default function BookingFormPage() {
                     {formData.hostel && (
                       <div className="col-md-6">
                         <div className="form-group" style={{ marginBottom: "20px" }}>
-                          <label style={{ fontWeight: "600" }}>Select Room *</label>
+                          <label style={{ fontWeight: "600" }}>
+                            <i className="bi bi-door-open me-1" style={{ color: "#525fe1" }}></i>
+                            Select Room *
+                          </label>
                           <select
                             name="room"
                             value={formData.room}
@@ -291,7 +323,10 @@ export default function BookingFormPage() {
                     {formData.room && beds.length > 0 && (
                       <div className="col-md-6">
                         <div className="form-group" style={{ marginBottom: "20px" }}>
-                          <label style={{ fontWeight: "600" }}>Select Bed *</label>
+                          <label style={{ fontWeight: "600" }}>
+                            <i className="bi bi-circle me-1" style={{ color: "#525fe1" }}></i>
+                            Select Bed *
+                          </label>
                           <select
                             name="bed"
                             value={formData.bed}
@@ -303,7 +338,7 @@ export default function BookingFormPage() {
                             <option value="">-- Select Bed --</option>
                             {beds.map(bed => (
                               <option key={bed.id} value={bed.id}>
-                                Bed {bed.bed_number} {bed.id === parseInt(bedId) ? "(Recommended)" : ""}
+                                Bed {bed.bed_number} {bed.id === parseInt(bedId) ? "⭐ (Recommended)" : ""}
                               </option>
                             ))}
                           </select>
@@ -319,11 +354,24 @@ export default function BookingFormPage() {
                         style={{
                           padding: "15px 50px",
                           opacity: loading ? 0.7 : 1,
-                          cursor: loading ? "not-allowed" : "pointer"
+                          cursor: loading ? "not-allowed" : "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "8px"
                         }}
                       >
-                        {loading ? "Processing..." : "Proceed to Payment"}
-                        <i className="ti-arrow-right"></i>
+                        {loading ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm" role="status"></span>
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-credit-card"></i>
+                            Proceed to Payment
+                            <i className="bi bi-arrow-right"></i>
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>

@@ -60,7 +60,7 @@ export default function HomePage() {
                     required
                   />
                   <button type="submit" className="subscribe__btn">
-                    Search <i className="fa fa-paper-plane-o"></i>
+                    Search <i className="bi bi-arrow-right ms-2"></i>
                   </button>
                 </form>
               </div>
@@ -70,9 +70,13 @@ export default function HomePage() {
               <div className="hero-text-img">
                 <img src="/assets/img/home-img2.png" className="img-fluid" alt="Student moving into hostel" />
                 <div className="home_ps">
-                  <span className="ti-user"></span>
-                  <h2>4500+</h2>
-                  <p>Students housed</p>
+                  <div className="icon-box">
+                    <i className="bi bi-people-fill"></i>
+                  </div>
+                  <div>
+                    <h2>4500+</h2>
+                    <p>Students housed</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -90,34 +94,50 @@ export default function HomePage() {
           <div className="row">
             <div className="col-lg-3 col-sm-6 col-xs-12">
               <div className="single-counter">
-                <span className="ti-folder sc_one"></span>
-                <h2 className="counter-num">{hostels.length || "—"}</h2>
-                <p>Hostels Listed</p>
+                <div className="icon-box sc_one">
+                  <i className="bi bi-building"></i>
+                </div>
+                <div className="counter-content">
+                  <h2 className="counter-num">{hostels.length || "—"}</h2>
+                  <p>Hostels Listed</p>
+                </div>
               </div>
             </div>
             <div className="col-lg-3 col-sm-6 col-xs-12">
               <div className="single-counter">
-                <span className="ti-medall-alt sc_two"></span>
-                <h2 className="counter-num">
-                  {hostels.reduce((sum, h) => sum + (h.available_beds || 0), 0) || "—"}
-                </h2>
-                <p>Beds Available Now</p>
+                <div className="icon-box sc_two">
+                  <i className="bi bi-bed-fill"></i>
+                </div>
+                <div className="counter-content">
+                  <h2 className="counter-num">
+                    {hostels.reduce((sum, h) => sum + (h.available_beds || 0), 0) || "—"}
+                  </h2>
+                  <p>Beds Available Now</p>
+                </div>
               </div>
             </div>
             {/* END COL */}
             <div className="col-lg-3 col-sm-6 col-xs-12">
               <div className="single-counter">
-                <span className="ti-id-badge sc_three"></span>
-                <h2 className="counter-num">10 Min</h2>
-                <p>Bed Hold While You Pay</p>
+                <div className="icon-box sc_three">
+                  <i className="bi bi-clock-fill"></i>
+                </div>
+                <div className="counter-content">
+                  <h2 className="counter-num">10 Min</h2>
+                  <p>Bed Hold While You Pay</p>
+                </div>
               </div>
             </div>
             {/* END COL */}
             <div className="col-lg-3 col-sm-6 col-xs-12">
               <div className="single-counter">
-                <span className="ti-user sc_four"></span>
-                <h2 className="counter-num">M-Pesa</h2>
-                <p>Instant Secure Payment</p>
+                <div className="icon-box sc_four">
+                  <i className="bi bi-phone-fill"></i>
+                </div>
+                <div className="counter-content">
+                  <h2 className="counter-num">M-Pesa</h2>
+                  <p>Instant Secure Payment</p>
+                </div>
               </div>
             </div>
             {/* END COL */}
@@ -153,11 +173,13 @@ export default function HomePage() {
               data-wow-offset="0"
             >
               <div className="single_tp">
-                <span className="sc_one">01</span>
-                <h3>
-                  Choose Your <br />Hostel
-                </h3>
-                <p>Browse Boys and Girls hostels and see live bed availability per room.</p>
+                <div className="icon-box sc_one">01</div>
+                <div className="tp-content">
+                  <h3>
+                    Choose Your <br />Hostel
+                  </h3>
+                  <p>Browse Boys and Girls hostels and see live bed availability per room.</p>
+                </div>
               </div>
             </div>
             {/* END COL */}
@@ -168,11 +190,13 @@ export default function HomePage() {
               data-wow-offset="0"
             >
               <div className="single_tp">
-                <span className="sc_two">02</span>
-                <h3>
-                  Pick Your <br />Bed
-                </h3>
-                <p>Select an exact bed in a room and we hold it for 10 minutes while you pay.</p>
+                <div className="icon-box sc_two">02</div>
+                <div className="tp-content">
+                  <h3>
+                    Pick Your <br />Bed
+                  </h3>
+                  <p>Select an exact bed in a room and we hold it for 10 minutes while you pay.</p>
+                </div>
               </div>
             </div>
             {/* END COL */}
@@ -183,11 +207,13 @@ export default function HomePage() {
               data-wow-offset="0"
             >
               <div className="single_tp">
-                <span className="sc_three">03</span>
-                <h3>
-                  Pay With <br />M-Pesa
-                </h3>
-                <p>Enter your Safaricom number and confirm the STK push on your phone.</p>
+                <div className="icon-box sc_three">03</div>
+                <div className="tp-content">
+                  <h3>
+                    Pay With <br />M-Pesa
+                  </h3>
+                  <p>Enter your Safaricom number and confirm the STK push on your phone.</p>
+                </div>
               </div>
             </div>
             {/* END COL */}
@@ -198,11 +224,13 @@ export default function HomePage() {
               data-wow-offset="0"
             >
               <div className="single_tp">
-                <span className="sc_four">04</span>
-                <h3>
-                  Get Your <br />Receipt
-                </h3>
-                <p>Download your e-receipt with a QR code and present it at check-in.</p>
+                <div className="icon-box sc_four">04</div>
+                <div className="tp-content">
+                  <h3>
+                    Get Your <br />Receipt
+                  </h3>
+                  <p>Download your e-receipt with a QR code and present it at check-in.</p>
+                </div>
               </div>
             </div>
             {/* END COL */}
@@ -247,19 +275,17 @@ export default function HomePage() {
                 </p>
                 <ul>
                   <li>
-                    <span className="ti-check"></span> Live bed-by-bed availability for every room
+                    <i className="bi bi-check-circle-fill"></i> Live bed-by-bed availability for every room
                   </li>
                   <li>
-                    <span className="ti-check"></span> Instant M-Pesa payment with automatic
-                    confirmation
+                    <i className="bi bi-check-circle-fill"></i> Instant M-Pesa payment with automatic confirmation
                   </li>
                   <li>
-                    <span className="ti-check"></span> Downloadable receipt with a scannable QR
-                    code
+                    <i className="bi bi-check-circle-fill"></i> Downloadable receipt with a scannable QR code
                   </li>
                 </ul>
                 <Link className="btn_one" to="/hostels">
-                  View All Hostels <i className="ti-arrow-top-right"></i>
+                  View All Hostels <i className="bi bi-arrow-right ms-2"></i>
                 </Link>
               </div>
             </div>
@@ -311,8 +337,7 @@ export default function HomePage() {
                   </li>
                   <li>
                     <Link to="/hostels">
-                      <img src="/assets/img/e4.png" alt="Nearest to lecture halls" /> Near
-                      Lecture Halls
+                      <img src="/assets/img/e4.png" alt="Nearest to lecture halls" /> Near Lecture Halls
                     </Link>
                   </li>
                   <li>
@@ -352,7 +377,7 @@ export default function HomePage() {
             <div className="col-lg-4 col-sm-6 col-xs-12">
               <div className="cour_btn">
                 <Link to="/hostels" className="btn_one">
-                  View all Hostels <i className="ti-arrow-top-right"></i>
+                  View all Hostels <i className="bi bi-arrow-right ms-2"></i>
                 </Link>
               </div>
             </div>
@@ -391,12 +416,12 @@ export default function HomePage() {
                     <Link to={`/hostels/${hostel.id}`}>{hostel.name}</Link>
                   </h4>
                   <p>
-                    <span className="ti-user"> </span> {hostel.available_beds} / {hostel.total_beds}{" "}
+                    <i className="bi bi-person me-1"></i> {hostel.available_beds} / {hostel.total_beds}{" "}
                     beds available
                   </p>
                   {hostel.location_notes && (
                     <p>
-                      <span className="ti-location-pin"> </span> {hostel.location_notes}
+                      <i className="bi bi-geo-alt me-1"></i> {hostel.location_notes}
                     </p>
                   )}
                   <div className="price">Fee - KES {hostel.fee_amount}</div>
@@ -432,7 +457,7 @@ export default function HomePage() {
                   href="https://www.youtube.com/watch?v=RXv_uIN6e-Y"
                   className="magnific_popup video-button"
                 >
-                  <i className="fa fa-play"></i>
+                  <i className="bi bi-play-fill"></i>
                 </a>
               </div>
             </div>
@@ -466,12 +491,12 @@ export default function HomePage() {
                   <ul className="social-links">
                     <li>
                       <a href="#">
-                        <i className="fa-solid fa-phone"></i>
+                        <i className="bi bi-telephone-fill"></i>
                       </a>
                     </li>
                     <li>
                       <a href="#">
-                        <i className="fa-solid fa-envelope"></i>
+                        <i className="bi bi-envelope-fill"></i>
                       </a>
                     </li>
                   </ul>
@@ -481,8 +506,12 @@ export default function HomePage() {
                   <span>Warden, Boys Hostel Block A</span>
                 </div>
                 <div className="sth_det2">
-                  <span className="ti-home"> <u>Block A</u></span>
-                  <span className="ti-user"> <u>120 Students</u></span>
+                  <span>
+                    <i className="bi bi-house-door me-1"></i> <u>Block A</u>
+                  </span>
+                  <span>
+                    <i className="bi bi-person me-1"></i> <u>120 Students</u>
+                  </span>
                 </div>
               </div>
             </div>
@@ -501,12 +530,12 @@ export default function HomePage() {
                   <ul className="social-links">
                     <li>
                       <a href="#">
-                        <i className="fa-solid fa-phone"></i>
+                        <i className="bi bi-telephone-fill"></i>
                       </a>
                     </li>
                     <li>
                       <a href="#">
-                        <i className="fa-solid fa-envelope"></i>
+                        <i className="bi bi-envelope-fill"></i>
                       </a>
                     </li>
                   </ul>
@@ -516,8 +545,12 @@ export default function HomePage() {
                   <span>Warden, Boys Hostel Block B</span>
                 </div>
                 <div className="sth_det2">
-                  <span className="ti-home"> <u>Block B</u></span>
-                  <span className="ti-user"> <u>96 Students</u></span>
+                  <span>
+                    <i className="bi bi-house-door me-1"></i> <u>Block B</u>
+                  </span>
+                  <span>
+                    <i className="bi bi-person me-1"></i> <u>96 Students</u>
+                  </span>
                 </div>
               </div>
             </div>
@@ -536,12 +569,12 @@ export default function HomePage() {
                   <ul className="social-links">
                     <li>
                       <a href="#">
-                        <i className="fa-solid fa-phone"></i>
+                        <i className="bi bi-telephone-fill"></i>
                       </a>
                     </li>
                     <li>
                       <a href="#">
-                        <i className="fa-solid fa-envelope"></i>
+                        <i className="bi bi-envelope-fill"></i>
                       </a>
                     </li>
                   </ul>
@@ -551,8 +584,12 @@ export default function HomePage() {
                   <span>Warden, Girls Hostel Block A</span>
                 </div>
                 <div className="sth_det2">
-                  <span className="ti-home"> <u>Block A</u></span>
-                  <span className="ti-user"> <u>140 Students</u></span>
+                  <span>
+                    <i className="bi bi-house-door me-1"></i> <u>Block A</u>
+                  </span>
+                  <span>
+                    <i className="bi bi-person me-1"></i> <u>140 Students</u>
+                  </span>
                 </div>
               </div>
             </div>
@@ -571,12 +608,12 @@ export default function HomePage() {
                   <ul className="social-links">
                     <li>
                       <a href="#">
-                        <i className="fa-solid fa-phone"></i>
+                        <i className="bi bi-telephone-fill"></i>
                       </a>
                     </li>
                     <li>
                       <a href="#">
-                        <i className="fa-solid fa-envelope"></i>
+                        <i className="bi bi-envelope-fill"></i>
                       </a>
                     </li>
                   </ul>
@@ -586,8 +623,12 @@ export default function HomePage() {
                   <span>Warden, Girls Hostel Block B</span>
                 </div>
                 <div className="sth_det2">
-                  <span className="ti-home"> <u>Block B</u></span>
-                  <span className="ti-user"> <u>110 Students</u></span>
+                  <span>
+                    <i className="bi bi-house-door me-1"></i> <u>Block B</u>
+                  </span>
+                  <span>
+                    <i className="bi bi-person me-1"></i> <u>110 Students</u>
+                  </span>
                 </div>
               </div>
             </div>
@@ -621,19 +662,17 @@ export default function HomePage() {
                 </p>
                 <ul>
                   <li>
-                    <span className="ti-check"></span> A 10-minute hold protects your bed while
-                    you pay
+                    <i className="bi bi-check-circle-fill"></i> A 10-minute hold protects your bed while you pay
                   </li>
                   <li>
-                    <span className="ti-check"></span> Works for both national ID and birth
-                    certificate holders
+                    <i className="bi bi-check-circle-fill"></i> Works for both national ID and birth certificate holders
                   </li>
                   <li>
-                    <span className="ti-check"></span> Get an emailed receipt the moment you pay
+                    <i className="bi bi-check-circle-fill"></i> Get an emailed receipt the moment you pay
                   </li>
                 </ul>
                 <Link className="btn_one" to="/hostels">
-                  Book Your Bed <i className="ti-arrow-top-right"></i>
+                  Book Your Bed <i className="bi bi-arrow-right ms-2"></i>
                 </Link>
               </div>
             </div>
@@ -647,9 +686,13 @@ export default function HomePage() {
               <div className="ab_img">
                 <img src="/assets/img/about3.png" className="img-fluid" alt="Booking on a laptop" />
                 <div className="home_ps2">
-                  <span className="ti-book"></span>
-                  <h2>{hostels.reduce((sum, h) => sum + (h.total_beds || 0), 0) || "3300+"}</h2>
-                  <p>Total Beds Managed</p>
+                  <div className="icon-box">
+                    <i className="bi bi-book"></i>
+                  </div>
+                  <div>
+                    <h2>{hostels.reduce((sum, h) => sum + (h.total_beds || 0), 0) || "3300+"}</h2>
+                    <p>Total Beds Managed</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -681,11 +724,13 @@ export default function HomePage() {
                 <div className="testimonial">
                   <img src="/assets/img/quote.png" alt="" />
                   <div className="testimonial_content">
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
+                    <div className="stars">
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                    </div>
                     <p>
                       I booked my bed from home the day admissions opened and paid with M-Pesa in
                       under two minutes. No queues at all.
@@ -693,19 +738,23 @@ export default function HomePage() {
                   </div>
                   <div className="testi_pic_title">
                     <img src="/assets/img/testimonial/1.png" alt="" />
-                    <h4>Brian Kiptoo</h4>
-                    <p>First Year, Boys Hostel Block A</p>
+                    <div>
+                      <h4>Brian Kiptoo</h4>
+                      <p>First Year, Boys Hostel Block A</p>
+                    </div>
                   </div>
                 </div>
                 {/* END TESTIMONIAL */}
                 <div className="testimonial">
                   <img src="/assets/img/quote.png" alt="" />
                   <div className="testimonial_content">
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
+                    <div className="stars">
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                    </div>
                     <p>
                       Seeing exactly which bed was free before paying gave me confidence I would
                       not lose my money on a room that was already full.
@@ -713,19 +762,23 @@ export default function HomePage() {
                   </div>
                   <div className="testi_pic_title">
                     <img src="/assets/img/testimonial/2.png" alt="" />
-                    <h4>Sharon Achieng</h4>
-                    <p>Second Year, Girls Hostel Block A</p>
+                    <div>
+                      <h4>Sharon Achieng</h4>
+                      <p>Second Year, Girls Hostel Block A</p>
+                    </div>
                   </div>
                 </div>
                 {/* END TESTIMONIAL */}
                 <div className="testimonial">
                   <img src="/assets/img/quote.png" alt="" />
                   <div className="testimonial_content">
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
-                    <i className="ti-star"></i>
+                    <div className="stars">
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                      <i className="bi bi-star-fill"></i>
+                    </div>
                     <p>
                       My receipt with the QR code made check-in day so fast - the warden just
                       scanned it and I was done.
@@ -733,8 +786,10 @@ export default function HomePage() {
                   </div>
                   <div className="testi_pic_title">
                     <img src="/assets/img/testimonial/3.png" alt="" />
-                    <h4>Kevin Mutua</h4>
-                    <p>Third Year, Boys Hostel Block B</p>
+                    <div>
+                      <h4>Kevin Mutua</h4>
+                      <p>Third Year, Boys Hostel Block B</p>
+                    </div>
                   </div>
                 </div>
                 {/* END TESTIMONIAL */}
@@ -772,8 +827,8 @@ export default function HomePage() {
                   <h2>
                     <a href="#">First-Year Booking Opens Next Week</a>
                   </h2>
-                  <a className="btn_one" href="#">
-                    Read More <i className="ti-arrow-top-right"></i>
+                  <a className="arti_btn" href="#">
+                    Read More <i className="bi bi-arrow-right"></i>
                   </a>
                 </div>
               </div>
@@ -794,8 +849,8 @@ export default function HomePage() {
                   <h2>
                     <a href="#">M-Pesa Is Now The Only Accepted Payment Method</a>
                   </h2>
-                  <a className="btn_one" href="#">
-                    Read More <i className="ti-arrow-top-right"></i>
+                  <a className="arti_btn" href="#">
+                    Read More <i className="bi bi-arrow-right"></i>
                   </a>
                 </div>
               </div>
@@ -816,8 +871,8 @@ export default function HomePage() {
                   <h2>
                     <a href="#">Beds Are Held For Only 10 Minutes During Checkout</a>
                   </h2>
-                  <a className="btn_one" href="#">
-                    Read More <i className="ti-arrow-top-right"></i>
+                  <a className="arti_btn" href="#">
+                    Read More <i className="bi bi-arrow-right"></i>
                   </a>
                 </div>
               </div>

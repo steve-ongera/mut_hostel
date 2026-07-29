@@ -46,7 +46,7 @@ export default function HostelsListPage() {
               <div className="section-top-title">
                 <h1>Our Hostels</h1>
                 <ul>
-                  <li><Link to="/">Home</Link> /</li>
+                  <li><Link to="/">Home</Link> <span className="separator">/</span></li>
                   <li>Hostels</li>
                 </ul>
               </div>
@@ -69,6 +69,7 @@ export default function HostelsListPage() {
                       className={`btn ${activeCategory === "all" ? "btn_one" : "btn-outline-primary"}`}
                       style={{ borderRadius: "30px", padding: "10px 30px", margin: "0 5px" }}
                     >
+                      <i className="bi bi-grid-3x3-gap-fill me-2"></i>
                       All Hostels
                     </button>
                   </li>
@@ -78,7 +79,7 @@ export default function HostelsListPage() {
                       className={`btn ${activeCategory === "boys" ? "btn_one" : "btn-outline-primary"}`}
                       style={{ borderRadius: "30px", padding: "10px 30px", margin: "0 5px" }}
                     >
-                      <img src="/assets/img/e1.png" alt="Boys" style={{ width: "30px", marginRight: "10px" }} />
+                      <i className="bi bi-person-fill me-2"></i>
                       Boys Hostels
                     </button>
                   </li>
@@ -88,7 +89,7 @@ export default function HostelsListPage() {
                       className={`btn ${activeCategory === "girls" ? "btn_one" : "btn-outline-primary"}`}
                       style={{ borderRadius: "30px", padding: "10px 30px", margin: "0 5px" }}
                     >
-                      <img src="/assets/img/e2.png" alt="Girls" style={{ width: "30px", marginRight: "10px" }} />
+                      <i className="bi bi-person-fill me-2" style={{ color: "#e83e8c" }}></i>
                       Girls Hostels
                     </button>
                   </li>
@@ -119,7 +120,7 @@ export default function HostelsListPage() {
             <div className="col-lg-4 col-sm-6 col-xs-12">
               <div className="cour_btn" style={{ marginTop: "0" }}>
                 <Link to="/" className="btn_one">
-                  Back to Home <i className="ti-arrow-top-right"></i>
+                  <i className="bi bi-arrow-left me-2"></i> Back to Home
                 </Link>
               </div>
             </div>
@@ -128,20 +129,25 @@ export default function HostelsListPage() {
           <div className="row">
             {loading && (
               <div className="col-12 text-center" style={{ padding: "60px 0" }}>
-                <p>Loading hostels...</p>
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3">Loading hostels...</p>
               </div>
             )}
             
             {error && (
               <div className="col-12">
-                <div className="alert alert-danger">
-                  <i className="ti-alert"></i> {error}
+                <div className="alert alert-danger d-flex align-items-center">
+                  <i className="bi bi-exclamation-triangle-fill me-2"></i> 
+                  {error}
                 </div>
               </div>
             )}
             
             {!loading && !error && hostels.length === 0 && (
               <div className="col-12 text-center" style={{ padding: "60px 0" }}>
+                <i className="bi bi-building" style={{ fontSize: "48px", color: "#ccc", display: "block", marginBottom: "20px" }}></i>
                 <h3>No hostels available</h3>
                 <p>Please check back later for available accommodations.</p>
               </div>
@@ -162,19 +168,15 @@ export default function HostelsListPage() {
                     <Link to={`/hostels/${hostel.id}`}>{hostel.name}</Link>
                   </h4>
                   <p>
-                    <span className="ti-user"> </span> 
+                    <i className="bi bi-person me-1"></i> 
                     {hostel.available_beds || 0} / {hostel.total_beds || 0} beds available
                   </p>
                   {hostel.location_notes && (
                     <p>
-                      <span className="ti-location-pin"> </span> {hostel.location_notes}
+                      <i className="bi bi-geo-alt me-1"></i> {hostel.location_notes}
                     </p>
                   )}
-                  {hostel.warden_name && (
-                    <p>
-                      <span className="ti-user"> </span> Warden: {hostel.warden_name}
-                    </p>
-                  )}
+                 
                   <div className="price">
                     KES {Number(hostel.fee_amount).toLocaleString()}
                     <br />
@@ -185,7 +187,7 @@ export default function HostelsListPage() {
                     className="btn_one"
                     style={{ display: "inline-block", marginBottom: "20px" }}
                   >
-                    View Details <i className="ti-arrow-right"></i>
+                    View Details <i className="bi bi-arrow-right ms-2"></i>
                   </Link>
                 </div>
               </div>
