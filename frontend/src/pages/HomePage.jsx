@@ -28,52 +28,89 @@ export default function HomePage() {
     <>
       {/* START HOME */}
       <section
-        className="home_bg hb_height"
+        id="hero-home-section"
+        className="home_bg"
         style={{
           backgroundImage: "url(/assets/img/bg/home-bg.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center center",
+          minHeight: "auto",
+          padding: "120px 0 80px",
+          display: "flex",
+          alignItems: "center"
         }}
       >
         <div className="container">
-          <div className="row">
-            <div className="col-lg-6 col-sm-12 col-xs-12">
-              <div className="hero-text ht_top">
+          <div className="row align-items-center">
+            <div className="col-lg-6 col-md-12 col-sm-12">
+              <div className="hero-text">
                 <h1>
-                  Muranga University Hostel Booking
+                  Muranga University <br />
+                  <span>Hostel Booking</span>
                 </h1>
                 <p>
                   Book your Muranga University hostel bed in minutes, pay securely with M-Pesa,
                   and get an instant e-receipt with a scannable QR code.
                 </p>
-              </div>
-              {/* REPLACED SEARCH WITH VIEW HOSTELS BUTTON */}
-              <div style={{ marginTop: "30px" }}>
-                <Link to="/hostels" className="btn_one" style={{ 
-                  padding: "15px 40px", 
-                  fontSize: "18px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  borderRadius: "3px"
-                }}>
-                  <i className="bi bi-building"></i>
-                  View All Hostels
-                  <i className="bi bi-arrow-right"></i>
-                </Link>
+                {/* View Hostels Button - Always visible */}
+                <div style={{ marginTop: "30px" }}>
+                  <Link to="/hostels" className="btn_one" style={{ 
+                    padding: "15px 40px", 
+                    fontSize: "18px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    borderRadius: "3px",
+                  }}>
+                    <i className="bi bi-building"></i>
+                    View All Hostels
+                    <i className="bi bi-arrow-right"></i>
+                  </Link>
+                </div>
               </div>
             </div>
             {/* END COL */}
-            <div className="col-lg-6 col-sm-12 col-xs-12">
-              <div className="hero-text-img">
-                <img src="/assets/img/hero_image.png" className="img-fluid" alt="Student moving into hostel" />
-                <div className="home_ps">
-                  <div className="icon-box">
+            
+            <div className="col-lg-6 col-md-12 col-sm-12">
+              <div className="hero-text-img" style={{ 
+                position: "relative", 
+                textAlign: "center",
+                marginTop: "30px"
+              }}>
+                <img 
+                  src="/assets/img/hero_image.png" 
+                  className="img-fluid" 
+                  alt="Student moving into hostel"
+                  style={{ maxWidth: "100%", height: "auto" }}
+                />
+                <div className="home_ps" style={{
+                  position: "absolute",
+                  bottom: "10%",
+                  left: "10%",
+                  background: "#fff",
+                  padding: "15px 20px",
+                  borderRadius: "8px",
+                  boxShadow: "0px 0 30px rgba(1, 41, 112, 0.08)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "15px"
+                }}>
+                  <div className="icon-box" style={{
+                    width: "50px",
+                    height: "50px",
+                    background: "#ECEDFF",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#2D36BB",
+                    fontSize: "20px"
+                  }}>
                     <i className="bi bi-people-fill"></i>
                   </div>
                   <div>
-                    <h2>4500+</h2>
-                    <p>Students housed</p>
+                    <h2 style={{ fontWeight: "500", margin: 0 }}>4500+</h2>
+                    <p style={{ margin: 0 }}>Students housed</p>
                   </div>
                 </div>
               </div>
@@ -86,7 +123,7 @@ export default function HomePage() {
       </section>
       {/* END HOME */}
 
-      {/* START COUNTER - UPDATED WITH BOOTSTRAP ICONS */}
+      {/* START COUNTER */}
       <section className="count_area counter_feature">
         <div className="container">
           <div className="row">

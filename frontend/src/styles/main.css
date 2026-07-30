@@ -420,14 +420,17 @@ margin-top: 0px;
 * ----------------------------------------------------------------------------------------
 */
 .home_bg {
-	height: 850px;
 	position:relative;
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	padding: 120px 0 80px;
 }
 @media only screen and (max-width:960px){
-.home_bg {height:650px;}
+.home_bg {min-height: auto;padding: 100px 0 60px;}
 }
 @media only screen and (max-width:480px){
-.home_bg {height:800px;}
+.home_bg {min-height: auto;padding: 80px 0 40px;}
 }
 .hero-text{position:relative;}
 .hero-text h1 span{color: #525fe1;}
@@ -437,22 +440,24 @@ margin-top: 0px;
 	font-weight: 700;
 	letter-spacing: 0;
 	line-height: 74px;
-	padding-top: 250px;
 	margin-bottom: 20px;
 }
 @media only screen and (max-width:960px){
-.hero-text h1 {padding-top:150px;font-size:64px;line-height:74px;}
+.hero-text h1 {font-size:64px;line-height:74px;}
 }
 @media only screen and (max-width:768px){
-.hero-text h1 {padding-top:150px;font-size: 64px;line-height: 74px;}
+.hero-text h1 {font-size: 48px;line-height: 58px;}
 }
 @media only screen and (max-width:480px){
-.hero-text h1 {padding-top:150px;font-size: 34px;line-height:44px;}
+.hero-text h1 {font-size: 34px;line-height: 44px;}
 }
 .hero-text p {
 	width:80%;
 	font-weight:500;
 	margin-bottom: 30px;
+}
+@media only screen and (max-width:768px){
+.hero-text p {width:100%;}
 }
 /*SUBSCRIBE FIELD*/
 .banner_subs {
@@ -502,16 +507,15 @@ border: 1px solid #525fe1!important;
 }
 /*END SUBSCRIBE FIELD*/
 .hero-text-img {
-	position: absolute;
-	bottom: 0;
-	right:5%;
+	position: relative;
+	text-align: center;
 }
-.hero-text-img img{position:relative;}
+.hero-text-img img{position:relative;max-width:100%;}
 @media only screen and (max-width:960px) { 
-.hero-text-img img{display:none;}
+.hero-text-img{margin-top:30px;}
 }
 @media only screen and (max-width:480px) { 
-.hero-text-img img{display:block;width:80%;}
+.hero-text-img img{max-width:100%;}
 }
 /*HOME TWO BANNER CSS*/
 .hero-text2{position:relative;}
@@ -619,32 +623,32 @@ border: 1px solid #525fe1!important;
 	border-radius: 8px;
 	box-shadow: 0px 0 30px rgba(1, 41, 112, 0.08);
 	position: absolute;
-	top: 45%;
-	right: 20%;
-	left: 60%;
+	bottom: 10%;
+	left: 10%;
 }	
 @media only screen and (max-width:1024px){
-.home_ps {display:none;}
+.home_ps {left: 5%;bottom:5%;}
 }
 @media only screen and (max-width:880px){
-.home_ps {display:none;}
+.home_ps {display:flex;align-items:center;gap:15px;left:50%;transform:translateX(-50%);bottom:5%;width:auto;}
 }	
 @media only screen and (max-width:480px){
-.home_ps {left: 35%;display:block}
+.home_ps {width:90%;max-width:280px;padding:15px;}
 }
-.home_ps span {
-color: #2D36BB;
+.home_ps .icon-box {
+	color: #2D36BB;
 	background: #ECEDFF;
 	width: 50px;
-	float: left;
 	height: 50px;
-	line-height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	border-radius: 8px;
 	font-size: 20px;
-	text-align: center;
 	margin-right: 15px;
 }
-.home_ps h2{font-weight:500;}
+.home_ps h2{font-weight:500;margin:0;}
+.home_ps p{margin:0;}
 /*
 * ----------------------------------------------------------------------------------------
 * 03.END HOME DESIGN
@@ -662,7 +666,10 @@ color: #2D36BB;
 	padding-bottom:80px;
 }
 @media only screen and (max-width:960px) { 
-.count_area {margin-top: 80px;}
+.count_area {margin-top: 20px;padding-bottom:40px;}
+}
+@media only screen and (max-width:480px) { 
+.count_area {margin-top: 0px;padding-bottom:20px;}
 }
 .single-counter {
 	background: #fff;
@@ -2626,8 +2633,8 @@ padding:40px;
 }
 .single_address h4{
 text-transform: capitalize;
-margin-bottom: 20px;
-font-weight: 700;
+	margin-bottom: 20px;
+	font-weight: 700;
 }
 .single_address p{}
 .sa_one {background: #FFEFEE;}
@@ -3317,5 +3324,189 @@ padding: 10px 12px !important;
   .cat_list_hostel .filter-btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* ============================================
+   HERO SECTION RESPONSIVE FIXES
+   ============================================ */
+
+/* Hero section responsive adjustments */
+@media only screen and (max-width: 1200px) {
+  .hero-text h1 {
+    font-size: 48px;
+    line-height: 58px;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  .hero-text h1 {
+    font-size: 40px;
+    line-height: 50px;
+  }
+  .hero-text p {
+    width: 90%;
+  }
+  .home_ps {
+    display: flex !important;
+    left: 50% !important;
+    transform: translateX(-50%);
+    bottom: 5%;
+    top: auto;
+    width: auto !important;
+  }
+  .hero-text-img {
+    position: relative;
+    right: 0;
+    text-align: center;
+    margin-top: 30px;
+  }
+  .hero-text-img img {
+    display: block !important;
+    max-width: 80%;
+    margin: 0 auto;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .home_bg {
+    padding: 80px 0 40px;
+    min-height: auto;
+  }
+  .hero-text h1 {
+    font-size: 34px;
+    line-height: 44px;
+  }
+  .hero-text p {
+    width: 100%;
+    font-size: 15px;
+  }
+  .hero-text {
+    text-align: center;
+  }
+  .hero-text .btn_one {
+    margin: 0 auto 20px;
+  }
+  .hero-text-img img {
+    max-width: 100%;
+    margin-top: 20px;
+  }
+  .home_ps {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+    margin: -30px auto 0;
+    width: 90% !important;
+    max-width: 280px;
+    justify-content: center;
+  }
+  .single-counter {
+    margin-bottom: 20px;
+  }
+  .count_area {
+    margin-top: 30px;
+    padding-bottom: 40px;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .home_bg {
+    padding: 60px 0 30px;
+  }
+  .hero-text h1 {
+    font-size: 28px;
+    line-height: 38px;
+  }
+  .hero-text p {
+    font-size: 14px;
+    line-height: 24px;
+  }
+  .hero-text .btn_one {
+    padding: 12px 25px;
+    font-size: 15px;
+    width: 100%;
+    justify-content: center;
+  }
+  .hero-text-img img {
+    max-width: 100%;
+  }
+  .home_ps {
+    padding: 12px 15px;
+    width: 95% !important;
+    max-width: 250px;
+  }
+  .home_ps .icon-box {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 16px !important;
+  }
+  .home_ps h2 {
+    font-size: 20px;
+  }
+  .home_ps p {
+    font-size: 12px;
+  }
+  .single-counter {
+    padding: 15px 20px;
+  }
+  .single-counter h2 {
+    font-size: 22px !important;
+  }
+  .single-counter p {
+    font-size: 12px !important;
+  }
+  .count_area {
+    margin-top: 0px;
+    padding-bottom: 20px;
+  }
+}
+
+/* Fix for hero section when using navbar-fixed */
+.navbar-fixed + #hero-home-section {
+  padding-top: 80px;
+}
+
+@media only screen and (max-width: 768px) {
+  .navbar-fixed + #hero-home-section {
+    padding-top: 60px;
+  }
+}
+
+/* Counter section spacing */
+.count_area {
+  position: relative;
+  margin-top: -60px;
+  padding-bottom: 80px;
+}
+
+@media only screen and (max-width: 992px) {
+  .count_area {
+    margin-top: 20px;
+    padding-bottom: 40px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .count_area {
+    margin-top: 0px;
+  }
+}
+
+/* Fix for section padding on mobile */
+@media only screen and (max-width: 768px) {
+  .section-padding {
+    padding: 50px 0 40px;
+  }
+  .section-title {
+    margin-bottom: 30px;
+  }
+  .section-title h2 {
+    font-size: 28px;
+    line-height: 38px;
+  }
+  .section-title p {
+    width: 100%;
+    font-size: 14px;
   }
 }
