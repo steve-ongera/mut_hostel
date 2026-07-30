@@ -1,3 +1,4 @@
+#api/receipt_service.py
 """
 Utilities to build a QR-coded booking receipt (PDF) and email it to the student.
 """

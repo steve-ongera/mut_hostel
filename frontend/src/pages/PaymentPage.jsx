@@ -7,7 +7,18 @@ export default function PaymentPage() {
   const navigate = useNavigate();
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  // Fatal: booking itself couldn't be loaded (bad id, deleted, network down on
+  // initial fetch). There's nothing to recover here, so we show a full-page
+  // error with a safe link back to /hostels.
+  const [loadError, setLoadError] = useState(null);
+
+  // Recoverable: an STK push attempt failed (wrong PIN, user cancelled on
+  // phone, network blip, gateway error, etc). The booking + bed hold are
+  // still valid, so we keep the user on this page and let them retry with
+  // the same or a corrected phone number.
+  const [payError, setPayError] = useState(null);
+
   const [status, setStatus] = useState("pending");
   const [paymentData, setPaymentData] = useState({ phone_number: "" });
   const [isPolling, setIsPolling] = useState(false);
@@ -22,14 +33,14 @@ export default function PaymentPage() {
         setBooking(data);
         setStatus(data.status);
         setLoading(false);
-        
+
         // If already paid, go to receipt
         if (data.status === "paid") {
           navigate(`/booking/${id}/receipt`);
         }
       })
       .catch(err => {
-        setError(extractErrorMessages(err).join(" "));
+        setLoadError(extractErrorMessages(err).join(" "));
         setLoading(false);
       });
 
@@ -43,7 +54,7 @@ export default function PaymentPage() {
   const startPolling = () => {
     setIsPolling(true);
     setAttempts(0);
-    
+
     if (pollInterval.current) {
       clearInterval(pollInterval.current);
     }
@@ -53,7 +64,7 @@ export default function PaymentPage() {
         if (prev >= MAX_ATTEMPTS) {
           clearInterval(pollInterval.current);
           setIsPolling(false);
-          setError("Payment timed out. Please try again or contact the hostel office.");
+          setPayError("Payment timed out. Please try again below.");
           return prev;
         }
         return prev + 1;
@@ -68,7 +79,6 @@ export default function PaymentPage() {
           } else if (data.booking_status === "cancelled" || data.booking_status === "expired") {
             clearInterval(pollInterval.current);
             setIsPolling(false);
-            setError("Payment was cancelled or expired. Please try booking again.");
             setStatus(data.booking_status);
           }
         })
@@ -80,7 +90,7 @@ export default function PaymentPage() {
 
   const handlePayment = async (e) => {
     e.preventDefault();
-    setError(null);
+    setPayError(null);
     setLoading(true);
 
     try {
@@ -88,11 +98,14 @@ export default function PaymentPage() {
         bookingId: parseInt(id),
         phoneNumber: paymentData.phone_number
       });
-      
+
       setStatus("pending_payment");
       startPolling();
     } catch (err) {
-      setError(extractErrorMessages(err).join(" "));
+      // Stay on this page. The booking + bed hold are unaffected by a
+      // failed STK push attempt, so just surface the error and let the
+      // student correct the number / retry.
+      setPayError(extractErrorMessages(err).join(" "));
     } finally {
       setLoading(false);
     }
@@ -105,7 +118,7 @@ export default function PaymentPage() {
     }));
   };
 
-  if (loading) {
+  if (loading && !booking) {
     return (
       <section className="section-padding">
         <div className="container text-center">
@@ -115,7 +128,8 @@ export default function PaymentPage() {
     );
   }
 
-  if (error && !isPolling) {
+  // Only a genuine failure to load the booking gets the full-page treatment.
+  if (loadError) {
     return (
       <section className="section-padding">
         <div className="container">
@@ -123,11 +137,8 @@ export default function PaymentPage() {
             <div className="col-lg-8 offset-lg-2">
               <div className="single_course" style={{ padding: "40px", textAlign: "center" }}>
                 <i className="ti-alert" style={{ fontSize: "60px", color: "#f26b65" }}></i>
-                <h3 style={{ marginTop: "20px" }}>Payment Error</h3>
-                <p style={{ color: "#f26b65" }}>{error}</p>
-                <Link to={`/booking/${id}`} className="btn_one" style={{ marginRight: "10px" }}>
-                  Try Again
-                </Link>
+                <h3 style={{ marginTop: "20px" }}>Couldn't Load Booking</h3>
+                <p style={{ color: "#f26b65" }}>{loadError}</p>
                 <Link to="/hostels" className="btn_one" style={{ background: "#f26b65", borderColor: "#f26b65" }}>
                   Back to Hostels
                 </Link>
@@ -200,12 +211,12 @@ export default function PaymentPage() {
                     <p style={{ marginTop: "20px", color: "#999" }}>
                       Time remaining: {Math.round((MAX_ATTEMPTS - attempts) / 2)} seconds
                     </p>
-                    <button 
+                    <button
                       onClick={() => {
                         if (pollInterval.current) {
                           clearInterval(pollInterval.current);
                           setIsPolling(false);
-                          setError("Payment cancelled by user.");
+                          setPayError("Payment cancelled. You can try again below.");
                         }
                       }}
                       className="btn_one"
@@ -219,7 +230,7 @@ export default function PaymentPage() {
                   <>
                     <div className="section-title text-center">
                       <h2>Pay with M-Pesa</h2>
-                      <p>Your bed is on hold for 10 minutes. Complete payment to confirm your booking.</p>
+                      <p>Your bed is on hold. Complete payment to confirm your booking.</p>
                     </div>
 
                     {booking && (
@@ -239,9 +250,9 @@ export default function PaymentPage() {
                       </div>
                     )}
 
-                    {error && (
+                    {payError && (
                       <div className="alert alert-danger">
-                        <i className="ti-alert"></i> {error}
+                        <i className="ti-alert"></i> {payError}
                       </div>
                     )}
 
@@ -265,8 +276,8 @@ export default function PaymentPage() {
                       </div>
 
                       <div className="text-center" style={{ marginTop: "30px" }}>
-                        <button 
-                          type="submit" 
+                        <button
+                          type="submit"
                           className="btn_one"
                           disabled={loading || isPolling}
                           style={{
@@ -275,7 +286,7 @@ export default function PaymentPage() {
                             cursor: loading || isPolling ? "not-allowed" : "pointer"
                           }}
                         >
-                          {loading ? "Processing..." : "Pay with M-Pesa"}
+                          {loading ? "Processing..." : payError ? "Retry Payment" : "Pay with M-Pesa"}
                           <i className="ti-arrow-right"></i>
                         </button>
                       </div>

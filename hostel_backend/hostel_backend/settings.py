@@ -106,12 +106,13 @@ REST_FRAMEWORK = {
 # ---------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = config(
     "CORS_ALLOWED_ORIGINS",
-    default="http://localhost:5173,http://127.0.0.1:5173",
+    default="http://localhost:5173,http://127.0.0.1:5173,https://6c89-102-222-145-174.ngrok-free.app",
     cast=Csv(),
 )
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
-    default="http://localhost:5173,http://127.0.0.1:5173",
+    default="http://localhost:5173,http://127.0.0.1:5173,https://6c89-102-222-145-174.ngrok-free.app",
+    
     cast=Csv(),
 )
  
@@ -136,7 +137,7 @@ MPESA_SHORTCODE = config("MPESA_SHORTCODE", default="174379")
 MPESA_PASSKEY = config("MPESA_PASSKEY", default="")
 # Must be a publicly reachable HTTPS URL (e.g. via ngrok in development)
 MPESA_CALLBACK_URL = config(
-    "MPESA_CALLBACK_URL", default="https://example.com/api/payments/mpesa/callback/"
+    "MPESA_CALLBACK_URL", default="https://6c89-102-222-145-174.ngrok-free.app/api/payments/mpesa/callback/"
 )
  
 # ---------------------------------------------------------------------------
