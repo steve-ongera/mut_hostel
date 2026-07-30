@@ -3257,19 +3257,28 @@ padding: 10px 12px !important;
   font-weight: 500;
 }
 
-/* Category Filter Styles - Compact */
+/* Category Filter Styles - Compact, responsive on every breakpoint */
+.cat_list_hostel {
+  width: 100%;
+}
+
 .cat_list_hostel ul {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
   list-style: none;
   padding: 0;
   margin: 0 0 40px 0;
 }
 
+.cat_list_hostel li {
+  flex: 0 0 auto;
+}
+
 .cat_list_hostel .filter-btn {
-  padding: 10px 30px;
+  padding: 12px 32px;
   border-radius: 30px;
   font-weight: 600;
   font-size: 16px;
@@ -3280,50 +3289,106 @@ padding: 10px 12px !important;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.cat_list_hostel .filter-btn i {
+  font-size: 15px;
+  line-height: 1;
 }
 
 .cat_list_hostel .filter-btn.active {
   background: #525fe1;
   color: #fff;
   border-color: #525fe1;
+  box-shadow: 0 6px 16px rgba(82, 95, 225, 0.25);
 }
 
-.cat_list_hostel .filter-btn:not(.active):hover {
+.cat_list_hostel .filter-btn:not(.active):hover,
+.cat_list_hostel .filter-btn:not(.active):focus-visible {
   background: #525fe1;
   color: #fff;
   border-color: #525fe1;
+}
+
+.cat_list_hostel .filter-btn:not(.active):hover i,
+.cat_list_hostel .filter-btn:not(.active):focus-visible i {
+  color: #fff;
 }
 
 .cat_list_hostel .filter-btn.girls-btn:not(.active) i {
   color: #e83e8c;
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
+/* Large screens: give the pills a little more breathing room */
+@media (min-width: 1200px) {
   .cat_list_hostel ul {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    justify-content: flex-start;
-    padding-bottom: 10px;
+    gap: 16px;
   }
-  
   .cat_list_hostel .filter-btn {
-    padding: 8px 20px;
-    font-size: 14px;
-    white-space: nowrap;
+    padding: 13px 36px;
   }
 }
 
+/* Tablet: keep pills on one row, scroll horizontally if they overflow */
+@media (max-width: 991px) {
+  .cat_list_hostel ul {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    padding: 2px 2px 14px;
+    margin-bottom: 30px;
+    scrollbar-width: thin;
+  }
+
+  .cat_list_hostel ul::-webkit-scrollbar {
+    height: 4px;
+  }
+  .cat_list_hostel ul::-webkit-scrollbar-thumb {
+    background: #d8dafc;
+    border-radius: 4px;
+  }
+
+  .cat_list_hostel li {
+    scroll-snap-align: start;
+  }
+
+  .cat_list_hostel .filter-btn {
+    padding: 10px 24px;
+    font-size: 15px;
+  }
+}
+
+/* Small tablets / large phones */
+@media (max-width: 768px) {
+  .cat_list_hostel .filter-btn {
+    padding: 9px 20px;
+    font-size: 14px;
+  }
+}
+
+/* Phones: stack full-width for easy tapping */
 @media (max-width: 480px) {
   .cat_list_hostel ul {
     flex-direction: column;
     flex-wrap: wrap;
+    overflow-x: visible;
+    scroll-snap-type: none;
+    padding-bottom: 0;
   }
-  
+
+  .cat_list_hostel li {
+    width: 100%;
+  }
+
   .cat_list_hostel .filter-btn {
     width: 100%;
-    justify-content: center;
+    padding: 12px 20px;
   }
 }
 
@@ -3509,4 +3574,120 @@ padding: 10px 12px !important;
     width: 100%;
     font-size: 14px;
   }
+}
+
+/* Testimonial Carousel Mobile Styles */
+@media only screen and (max-width: 992px) {
+  .carousel-control-prev {
+    left: 5px !important;
+  }
+  .carousel-control-next {
+    right: 5px !important;
+  }
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 35px !important;
+    height: 35px !important;
+  }
+  .carousel-control-prev i,
+  .carousel-control-next i {
+    font-size: 16px !important;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .testimonial {
+    padding: 20px !important;
+  }
+  .testimonial p {
+    font-size: 16px !important;
+    line-height: 26px !important;
+  }
+  .testi_pic_title {
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+  .carousel-indicators {
+    margin-top: 15px !important;
+  }
+  .carousel-indicators button {
+    width: 10px !important;
+    height: 10px !important;
+  }
+  .carousel-control-prev {
+    left: 0px !important;
+  }
+  .carousel-control-next {
+    right: 0px !important;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .testimonial p {
+    font-size: 14px !important;
+    line-height: 22px !important;
+  }
+  .testi_pic_title img {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  .testi_pic_title h4 {
+    font-size: 16px !important;
+  }
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  .carousel-control-prev i,
+  .carousel-control-next i {
+    font-size: 14px !important;
+  }
+}
+
+/* ============================================
+   TESTIMONIAL CAROUSEL FIX
+   ============================================
+   The homepage testimonial carousel is now driven entirely by React
+   state (see HomePage.jsx) instead of Bootstrap's JS carousel plugin.
+   Bootstrap only auto-initializes elements with data-bs-ride="carousel"
+   that exist in the DOM at initial page load; since this markup is
+   rendered by React (and can remount on route changes), the plugin
+   never attached, so nothing ever advanced. These rules implement a
+   simple, dependency-free fade transition driven by the "active" class
+   that React toggles on each .carousel-item.
+   ============================================ */
+.testi_area .carousel-inner {
+  position: relative;
+  overflow: hidden;
+}
+
+.testi_area .carousel-item {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+}
+
+.testi_area .carousel-item.active {
+  display: block;
+  opacity: 1;
+}
+
+.testi_area .carousel-control-prev,
+.testi_area .carousel-control-next {
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.testi_area .carousel-control-prev:hover,
+.testi_area .carousel-control-next:hover {
+  background: #f26b65 !important;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.testi_area .carousel-indicators button {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.testi_area .carousel-indicators button[aria-current="true"] {
+  transform: scale(1.15);
 }

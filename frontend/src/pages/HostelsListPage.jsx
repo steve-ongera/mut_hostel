@@ -6,7 +6,7 @@ export default function HostelsListPage() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const categoryParam = searchParams.get("category");
-  
+
   const [hostels, setHostels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,7 +15,7 @@ export default function HostelsListPage() {
   useEffect(() => {
     let isMounted = true;
     const category = activeCategory !== "all" ? activeCategory : null;
-    
+
     setLoading(true);
     getHostels(category)
       .then((data) => {
@@ -35,6 +35,16 @@ export default function HostelsListPage() {
   const handleCategoryChange = (category) => {
     setActiveCategory(category);
   };
+
+  // Config-driven filter buttons so the markup stays clean and consistent
+  // across breakpoints. Styling/responsiveness now lives entirely in
+  // main.css (.cat_list_hostel / .filter-btn), not inline styles, since
+  // inline styles can't respond to media queries.
+  const categoryFilters = [
+    { key: "all", label: "All Hostels", icon: "bi-grid-3x3-gap-fill" },
+    { key: "boys", label: "Boys Hostels", icon: "bi-person-fill" },
+    { key: "girls", label: "Girls Hostels", icon: "bi-person-fill", extraClass: "girls-btn" },
+  ];
 
   return (
     <>
@@ -61,113 +71,23 @@ export default function HostelsListPage() {
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
-              <div className="cat_list_hostel" style={{ marginBottom: "40px" }}>
+              <div className="cat_list_hostel">
                 <ul>
-                  <li>
-                    <button 
-                      onClick={() => handleCategoryChange("all")}
-                      className={activeCategory === "all" ? "btn_one" : "btn-outline-primary"}
-                      style={{ 
-                        borderRadius: "30px", 
-                        padding: "10px 30px", 
-                        margin: "0 5px",
-                        background: activeCategory === "all" ? "#525fe1" : "transparent",
-                        color: activeCategory === "all" ? "#fff" : "#0b104a",
-                        border: activeCategory === "all" ? "1px solid #525fe1" : "1px solid #ddd",
-                        transition: "all 0.3s ease",
-                        cursor: "pointer",
-                        fontWeight: "600",
-                        fontSize: "16px"
-                      }}
-                      onMouseEnter={(e) => {
-                        if (activeCategory !== "all") {
-                          e.target.style.background = "#525fe1";
-                          e.target.style.color = "#fff";
-                          e.target.style.borderColor = "#525fe1";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (activeCategory !== "all") {
-                          e.target.style.background = "transparent";
-                          e.target.style.color = "#0b104a";
-                          e.target.style.borderColor = "#ddd";
-                        }
-                      }}
-                    >
-                      <i className="bi bi-grid-3x3-gap-fill me-2"></i>
-                      All Hostels
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => handleCategoryChange("boys")}
-                      className={activeCategory === "boys" ? "btn_one" : "btn-outline-primary"}
-                      style={{ 
-                        borderRadius: "30px", 
-                        padding: "10px 30px", 
-                        margin: "0 5px",
-                        background: activeCategory === "boys" ? "#525fe1" : "transparent",
-                        color: activeCategory === "boys" ? "#fff" : "#0b104a",
-                        border: activeCategory === "boys" ? "1px solid #525fe1" : "1px solid #ddd",
-                        transition: "all 0.3s ease",
-                        cursor: "pointer",
-                        fontWeight: "600",
-                        fontSize: "16px"
-                      }}
-                      onMouseEnter={(e) => {
-                        if (activeCategory !== "boys") {
-                          e.target.style.background = "#525fe1";
-                          e.target.style.color = "#fff";
-                          e.target.style.borderColor = "#525fe1";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (activeCategory !== "boys") {
-                          e.target.style.background = "transparent";
-                          e.target.style.color = "#0b104a";
-                          e.target.style.borderColor = "#ddd";
-                        }
-                      }}
-                    >
-                      <i className="bi bi-person-fill me-2"></i>
-                      Boys Hostels
-                    </button>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={() => handleCategoryChange("girls")}
-                      className={activeCategory === "girls" ? "btn_one" : "btn-outline-primary"}
-                      style={{ 
-                        borderRadius: "30px", 
-                        padding: "10px 30px", 
-                        margin: "0 5px",
-                        background: activeCategory === "girls" ? "#525fe1" : "transparent",
-                        color: activeCategory === "girls" ? "#fff" : "#0b104a",
-                        border: activeCategory === "girls" ? "1px solid #525fe1" : "1px solid #ddd",
-                        transition: "all 0.3s ease",
-                        cursor: "pointer",
-                        fontWeight: "600",
-                        fontSize: "16px"
-                      }}
-                      onMouseEnter={(e) => {
-                        if (activeCategory !== "girls") {
-                          e.target.style.background = "#525fe1";
-                          e.target.style.color = "#fff";
-                          e.target.style.borderColor = "#525fe1";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (activeCategory !== "girls") {
-                          e.target.style.background = "transparent";
-                          e.target.style.color = "#0b104a";
-                          e.target.style.borderColor = "#ddd";
-                        }
-                      }}
-                    >
-                      <i className="bi bi-person-fill me-2" style={{ color: activeCategory === "girls" ? "#fff" : "#e83e8c" }}></i>
-                      Girls Hostels
-                    </button>
-                  </li>
+                  {categoryFilters.map((filter) => {
+                    const isActive = activeCategory === filter.key;
+                    return (
+                      <li key={filter.key}>
+                        <button
+                          type="button"
+                          onClick={() => handleCategoryChange(filter.key)}
+                          className={`filter-btn${filter.extraClass ? ` ${filter.extraClass}` : ""}${isActive ? " active" : ""}`}
+                        >
+                          <i className={`bi ${filter.icon}`}></i>
+                          {filter.label}
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
@@ -211,31 +131,31 @@ export default function HostelsListPage() {
                 <p className="mt-3" style={{ fontWeight: "500" }}>Loading hostels...</p>
               </div>
             )}
-            
+
             {/* Error State */}
             {error && (
               <div className="col-12">
-                <div className="alert alert-danger d-flex align-items-center" style={{ 
-                  padding: "15px 20px", 
+                <div className="alert alert-danger d-flex align-items-center" style={{
+                  padding: "15px 20px",
                   borderRadius: "8px",
                   border: "1px solid #f5c6cb",
                   background: "#f8d7da",
                   color: "#721c24"
                 }}>
-                  <i className="bi bi-exclamation-triangle-fill me-2" style={{ fontSize: "20px" }}></i> 
+                  <i className="bi bi-exclamation-triangle-fill me-2" style={{ fontSize: "20px" }}></i>
                   {error}
                 </div>
               </div>
             )}
-            
+
             {/* Empty State */}
             {!loading && !error && hostels.length === 0 && (
               <div className="col-12 text-center" style={{ padding: "60px 0" }}>
-                <i className="bi bi-building" style={{ 
-                  fontSize: "64px", 
-                  color: "#ccc", 
-                  display: "block", 
-                  marginBottom: "20px" 
+                <i className="bi bi-building" style={{
+                  fontSize: "64px",
+                  color: "#ccc",
+                  display: "block",
+                  marginBottom: "20px"
                 }}></i>
                 <h3 style={{ fontWeight: "600", marginBottom: "10px" }}>No hostels available</h3>
                 <p style={{ color: "#6c757d" }}>Please check back later for available accommodations.</p>
@@ -270,9 +190,9 @@ export default function HostelsListPage() {
                       {hostel.category === "boys" ? "Boys" : "Girls"}
                     </span>
                   </div>
-                  
+
                   <h4 style={{ padding: "20px 20px 10px", marginBottom: "5px" }}>
-                    <Link to={`/hostels/${hostel.id}`} style={{ 
+                    <Link to={`/hostels/${hostel.id}`} style={{
                       fontWeight: "600",
                       fontSize: "20px",
                       lineHeight: "28px"
@@ -280,21 +200,21 @@ export default function HostelsListPage() {
                       {hostel.name}
                     </Link>
                   </h4>
-                  
+
                   <div style={{ padding: "0 20px" }}>
                     <p style={{ marginBottom: "5px" }}>
-                      <i className="bi bi-person me-1" style={{ color: "#525fe1" }}></i> 
+                      <i className="bi bi-person me-1" style={{ color: "#525fe1" }}></i>
                       <span style={{ fontWeight: "600" }}>{hostel.available_beds || 0}</span> / {hostel.total_beds || 0} beds available
                     </p>
                     {hostel.location_notes && (
                       <p style={{ marginBottom: "5px" }}>
-                        <i className="bi bi-geo-alt me-1" style={{ color: "#525fe1" }}></i> 
+                        <i className="bi bi-geo-alt me-1" style={{ color: "#525fe1" }}></i>
                         {hostel.location_notes}
                       </p>
                     )}
                   </div>
-                 
-                  <div className="price" style={{ 
+
+                  <div className="price" style={{
                     padding: "15px 20px",
                     marginTop: "15px",
                     borderTop: "1px solid #e8e8e9",
@@ -303,9 +223,9 @@ export default function HostelsListPage() {
                     alignItems: "center"
                   }}>
                     <div>
-                      <span style={{ 
-                        fontSize: "22px", 
-                        fontWeight: "700", 
+                      <span style={{
+                        fontSize: "22px",
+                        fontWeight: "700",
                         color: "#525fe1"
                       }}>
                         KES {Number(hostel.fee_amount).toLocaleString()}
@@ -313,10 +233,10 @@ export default function HostelsListPage() {
                       <br />
                       <small style={{ fontSize: "13px", fontWeight: "400", color: "#6c757d" }}>per bed</small>
                     </div>
-                    <Link 
+                    <Link
                       to={`/hostels/${hostel.id}`}
                       className="btn_one"
-                      style={{ 
+                      style={{
                         padding: "8px 20px",
                         fontSize: "14px",
                         borderRadius: "6px"

@@ -2,10 +2,37 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getHostels, resolveMediaUrl, extractErrorMessages } from "../services/api";
 
+const TESTIMONIALS = [
+  {
+    text:
+      "I booked my bed from home the day admissions opened and paid with M-Pesa in under two minutes. No queues at all.",
+    name: "Brian Kiptoo",
+    role: "First Year, Boys Hostel Block A",
+    image: "/assets/img/testimonial/1.png",
+  },
+  {
+    text:
+      "Seeing exactly which bed was free before paying gave me confidence I would not lose my money on a room that was already full.",
+    name: "Sharon Achieng",
+    role: "Second Year, Girls Hostel Block A",
+    image: "/assets/img/testimonial/2.png",
+  },
+  {
+    text:
+      "My receipt with the QR code made check-in day so fast - the warden just scanned it and I was done.",
+    name: "Kevin Mutua",
+    role: "Third Year, Boys Hostel Block B",
+    image: "/assets/img/testimonial/3.png",
+  },
+];
+
 export default function HomePage() {
   const [hostels, setHostels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Testimonial carousel state (self-contained, no Bootstrap JS dependency)
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -23,6 +50,26 @@ export default function HomePage() {
       isMounted = false;
     };
   }, []);
+
+  // Auto-advance the testimonial carousel every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTestimonial((prev) => (prev + 1) % TESTIMONIALS.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const goToTestimonial = (index) => {
+    setActiveTestimonial(index);
+  };
+
+  const goToPrevTestimonial = () => {
+    setActiveTestimonial((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+  };
+
+  const goToNextTestimonial = () => {
+    setActiveTestimonial((prev) => (prev + 1) % TESTIMONIALS.length);
+  };
 
   return (
     <>
@@ -912,7 +959,7 @@ export default function HomePage() {
       {/* START TESTIMONIALS */}
       <section className="testi_area section-padding">
         <div className="container">
-          <div className="section-title">
+          <div className="section-title text-center">
             <h2>
               What Students Say About <br />Booking Online
             </h2>
@@ -924,82 +971,167 @@ export default function HomePage() {
               </div>
             </div>
             {/* END COL */}
+
             <div className="col-lg-6 col-sm-12 col-xs-12">
-              <div id="testimonial-slider" className="owl-carousel">
-                <div className="testimonial">
-                  <img src="/assets/img/quote.png" alt="" />
-                  <div className="testimonial_content">
-                    <div className="stars">
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                    </div>
-                    <p>
-                      I booked my bed from home the day admissions opened and paid with M-Pesa in
-                      under two minutes. No queues at all.
-                    </p>
-                  </div>
-                  <div className="testi_pic_title">
-                    <img src="/assets/img/testimonial/1.png" alt="" />
-                    <div>
-                      <h4>Brian Kiptoo</h4>
-                      <p>First Year, Boys Hostel Block A</p>
-                    </div>
-                  </div>
+              {/*
+                Self-contained React testimonial carousel.
+                This does NOT rely on Bootstrap's JS carousel plugin, which only
+                auto-initializes elements present at initial page load. Because this
+                section is rendered by React (and can remount on route changes),
+                data-bs-ride="carousel" never got wired up, so it never advanced.
+                State + setInterval below guarantees it always works.
+              */}
+              <div className="carousel slide" style={{ position: "relative" }}>
+                {/* Carousel Indicators */}
+                <div className="carousel-indicators" style={{
+                  position: 'relative',
+                  marginTop: '20px',
+                  marginBottom: '0'
+                }}>
+                  {TESTIMONIALS.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => goToTestimonial(idx)}
+                      aria-current={activeTestimonial === idx ? "true" : undefined}
+                      aria-label={`Slide ${idx + 1}`}
+                      style={{
+                        width: '12px',
+                        height: '12px',
+                        borderRadius: '50%',
+                        border: '2px solid #525fe1',
+                        backgroundColor: activeTestimonial === idx ? '#525fe1' : 'transparent',
+                        margin: '0 5px',
+                        padding: '0',
+                        cursor: 'pointer'
+                      }}
+                    ></button>
+                  ))}
                 </div>
-                {/* END TESTIMONIAL */}
-                <div className="testimonial">
-                  <img src="/assets/img/quote.png" alt="" />
-                  <div className="testimonial_content">
-                    <div className="stars">
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
+
+                {/* Carousel Inner */}
+                <div className="carousel-inner" style={{ padding: '10px 0' }}>
+                  {TESTIMONIALS.map((t, idx) => (
+                    <div
+                      key={idx}
+                      className={`carousel-item${activeTestimonial === idx ? " active" : ""}`}
+                    >
+                      <div className="testimonial" style={{
+                        background: '#fff',
+                        borderRadius: '12px',
+                        padding: '30px',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.06)',
+                        border: '1px solid #f0f0f0',
+                        margin: '0'
+                      }}>
+                        <img src="/assets/img/quote.png" alt="" style={{ width: '50px', marginBottom: '15px' }} />
+                        <div className="testimonial_content">
+                          <div className="stars" style={{ marginBottom: '12px' }}>
+                            <i className="bi bi-star-fill" style={{ color: '#FFB800', fontSize: '18px', marginRight: '4px' }}></i>
+                            <i className="bi bi-star-fill" style={{ color: '#FFB800', fontSize: '18px', marginRight: '4px' }}></i>
+                            <i className="bi bi-star-fill" style={{ color: '#FFB800', fontSize: '18px', marginRight: '4px' }}></i>
+                            <i className="bi bi-star-fill" style={{ color: '#FFB800', fontSize: '18px', marginRight: '4px' }}></i>
+                            <i className="bi bi-star-fill" style={{ color: '#FFB800', fontSize: '18px', marginRight: '4px' }}></i>
+                          </div>
+                          <p style={{
+                            fontSize: '18px',
+                            lineHeight: '30px',
+                            color: '#1a1a2e',
+                            fontStyle: 'italic',
+                            marginBottom: '20px'
+                          }}>
+                            "{t.text}"
+                          </p>
+                        </div>
+                        <div className="testi_pic_title" style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '15px',
+                          background: '#f8f9fa',
+                          padding: '15px 20px',
+                          borderRadius: '8px',
+                          marginTop: '5px'
+                        }}>
+                          <img
+                            src={t.image}
+                            alt=""
+                            style={{
+                              width: '60px',
+                              height: '60px',
+                              borderRadius: '50%',
+                              border: '3px solid #fff',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                            }}
+                          />
+                          <div style={{ textAlign: 'left' }}>
+                            <h4 style={{
+                              fontSize: '18px',
+                              fontWeight: '700',
+                              margin: '0 0 4px 0',
+                              color: '#0b104a'
+                            }}>
+                              {t.name}
+                            </h4>
+                            <p style={{
+                              fontSize: '14px',
+                              color: '#6c757d',
+                              margin: '0'
+                            }}>
+                              {t.role}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <p>
-                      Seeing exactly which bed was free before paying gave me confidence I would
-                      not lose my money on a room that was already full.
-                    </p>
-                  </div>
-                  <div className="testi_pic_title">
-                    <img src="/assets/img/testimonial/2.png" alt="" />
-                    <div>
-                      <h4>Sharon Achieng</h4>
-                      <p>Second Year, Girls Hostel Block A</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
-                {/* END TESTIMONIAL */}
-                <div className="testimonial">
-                  <img src="/assets/img/quote.png" alt="" />
-                  <div className="testimonial_content">
-                    <div className="stars">
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                      <i className="bi bi-star-fill"></i>
-                    </div>
-                    <p>
-                      My receipt with the QR code made check-in day so fast - the warden just
-                      scanned it and I was done.
-                    </p>
-                  </div>
-                  <div className="testi_pic_title">
-                    <img src="/assets/img/testimonial/3.png" alt="" />
-                    <div>
-                      <h4>Kevin Mutua</h4>
-                      <p>Third Year, Boys Hostel Block B</p>
-                    </div>
-                  </div>
-                </div>
-                {/* END TESTIMONIAL */}
+
+                {/* Carousel Controls with Bootstrap Icons */}
+                <button
+                  className="carousel-control-prev"
+                  type="button"
+                  onClick={goToPrevTestimonial}
+                  aria-label="Previous testimonial"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    background: '#525fe1',
+                    borderRadius: '50%',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    left: '-50px',
+                    opacity: '1',
+                    position: 'absolute',
+                    border: 'none',
+                    zIndex: '10',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <i className="bi bi-chevron-left" style={{ fontSize: '20px', color: '#fff' }}></i>
+                </button>
+                <button
+                  className="carousel-control-next"
+                  type="button"
+                  onClick={goToNextTestimonial}
+                  aria-label="Next testimonial"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    background: '#525fe1',
+                    borderRadius: '50%',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    right: '-50px',
+                    opacity: '1',
+                    position: 'absolute',
+                    border: 'none',
+                    zIndex: '10',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <i className="bi bi-chevron-right" style={{ fontSize: '20px', color: '#fff' }}></i>
+                </button>
               </div>
-              {/* END TESTIMONIAL SLIDER */}
             </div>
             {/* END COL */}
           </div>
