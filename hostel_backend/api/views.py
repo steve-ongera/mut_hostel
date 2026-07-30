@@ -157,7 +157,10 @@ class InitiateSTKPushView(APIView):
                 transaction_desc=f"MUT Hostel Booking {booking.booking_reference}",
             )
         except MpesaError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
+            return Response(
+                {"detail": str(exc), "daraja_error": exc.daraja_body},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
 
         MpesaTransaction.objects.update_or_create(
             booking=booking,
