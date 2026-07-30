@@ -16,6 +16,7 @@ from reportlab.lib.colors import HexColor, Color, gray
 from reportlab.lib.pagesizes import A5
 from reportlab.lib.units import mm
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfgen import canvas
 
 logger = logging.getLogger(__name__)
@@ -84,7 +85,7 @@ def _draw_center_logo_watermark(c, width, height):
             c.saveState()
             # Large logo watermark - about 50% of page width
             watermark_size = width * 0.5
-            
+
             # Draw with very low opacity
             c.setFillColor(Color(0.5, 0.5, 0.5, alpha=0.08))  # Very faint gray
             c.drawImage(
@@ -112,14 +113,24 @@ def _draw_paid_watermark(c, width, height):
     c.restoreState()
 
 
+def _fit_font_size(text, font_name, max_size, min_size, max_width):
+    """Return the largest font size (between min_size and max_size) at which
+    `text` fits within max_width, so long institution names never collide
+    with the right-hand column of the header."""
+    size = max_size
+    while size > min_size and stringWidth(text, font_name, size) > max_width:
+        size -= 0.5
+    return size
+
+
 def _draw_header(c, width, height, booking):
     """Professional header with clearly visible logo and clean typography."""
     band_height = 28 * mm
-    
+
     # Clean white header with subtle bottom border
     c.setFillColor(HexColor("#ffffff"))
     c.rect(0, height - band_height, width, band_height, stroke=0, fill=1)
-    
+
     # Subtle border line at bottom of header
     c.setStrokeColor(BORDER_GRAY)
     c.setLineWidth(0.5)
@@ -148,48 +159,68 @@ def _draw_header(c, width, height, booking):
     else:
         text_x = 15 * mm
 
-    # Institution name - clean, professional
+    # Reserve space for the right-hand column (receipt no. + badge) so the
+    # institution name can never be drawn underneath/behind it.
+    receipt_label = f"Receipt: {booking.receipt_number or booking.booking_reference}"
+    right_col_width = max(
+        stringWidth(receipt_label, "Helvetica", 8),
+        stringWidth("PAYMENT CONFIRMED", "Helvetica-Bold", 9),
+    )
+    right_col_start = width - 15 * mm - right_col_width
+
+    # Institution name - clean, professional. Auto-shrink to fit the space
+    # between the logo and the right-hand column so long names never overlap.
+    available_name_width = right_col_start - text_x - 4 * mm
+    name_font_size = _fit_font_size(
+        INSTITUTION_NAME, "Helvetica-Bold", max_size=13, min_size=8, max_width=available_name_width
+    )
     c.setFillColor(TEXT_DARK)
-    c.setFont("Helvetica-Bold", 13)
+    c.setFont("Helvetica-Bold", name_font_size)
     c.drawString(text_x, height - 11 * mm, INSTITUTION_NAME)
-    
+
     # Tagline - smaller, gray
     c.setFillColor(TEXT_GRAY)
     c.setFont("Helvetica", 8.5)
     c.drawString(text_x, height - 17 * mm, INSTITUTION_TAGLINE)
 
-    # Receipt badge on the right
-    c.setFillColor(SUCCESS_GREEN)
-    c.setFont("Helvetica-Bold", 9)
-    c.drawRightString(width - 15 * mm, height - 12 * mm, "PAYMENT CONFIRMED")
-    
+    # Receipt number on top, PAYMENT CONFIRMED badge below it
     c.setFillColor(TEXT_GRAY)
     c.setFont("Helvetica", 8)
-    c.drawRightString(width - 15 * mm, height - 17.5 * mm, f"Receipt: {booking.receipt_number or booking.booking_reference}")
+    c.drawRightString(width - 15 * mm, height - 12 * mm, receipt_label)
+
+    c.setFillColor(SUCCESS_GREEN)
+    c.setFont("Helvetica-Bold", 9)
+    c.drawRightString(width - 15 * mm, height - 17.5 * mm, "PAYMENT CONFIRMED")
 
     return height - band_height  # y-coordinate where the header ends
 
 
 def _draw_info_card(c, x, y, w, rows):
-    """A clean card with alternating light-gray rows of label/value pairs."""
+    """A translucent card (watermark shows through) with alternating light-gray rows of label/value pairs."""
     row_height = 7.5 * mm
     card_height = row_height * len(rows) + 4 * mm
     top = y
 
-    # Card background
-    c.setFillColor(BG_GRAY)
+    # Card background - semi-transparent so the watermark behind it is visible
+    c.saveState()
+    c.setFillColor(Color(0.976, 0.980, 0.984, alpha=0.35))  # BG_GRAY at 35% opacity
     c.roundRect(x, top - card_height, w, card_height, 2, stroke=0, fill=1)
-    
-    # Card border
-    c.setStrokeColor(BORDER_GRAY)
+    c.restoreState()
+
+    # Card border - also softened slightly
+    c.saveState()
+    c.setStrokeColor(Color(0.898, 0.906, 0.922, alpha=0.6))  # BORDER_GRAY at 60% opacity
     c.setLineWidth(0.5)
     c.roundRect(x, top - card_height, w, card_height, 2, stroke=1, fill=0)
+    c.restoreState()
 
     cursor_y = top - 3 * mm - row_height + 5
     for i, (label, value) in enumerate(rows):
         if i % 2 == 1:
-            c.setFillColor(HexColor("#f3f4f6"))  # Slightly darker gray for alternating rows
+            c.saveState()
+            c.setFillColor(Color(0.953, 0.957, 0.965, alpha=0.3))  # alternating row tint, low opacity
             c.rect(x + 0.5 * mm, cursor_y - 2, w - 1 * mm, row_height, stroke=0, fill=1)
+            c.restoreState()
 
         c.setFillColor(TEXT_GRAY)
         c.setFont("Helvetica-Bold", 8.5)
@@ -212,10 +243,10 @@ def build_receipt_pdf(booking):
 
     # Draw large, faint logo watermark at the center
     _draw_center_logo_watermark(c, width, height)
-    
+
     # Draw "PAID" watermark diagonally
     _draw_paid_watermark(c, width, height)
-    
+
     # Header - pass booking parameter
     header_bottom = _draw_header(c, width, height, booking)
 
@@ -258,12 +289,12 @@ def build_receipt_pdf(booking):
             booking.qr_code.open("rb")
             qr_image = ImageReader(booking.qr_code)
             qr_x = width - 15 * mm - qr_size
-            
+
             # QR box with light border
             c.setStrokeColor(BORDER_GRAY)
             c.setLineWidth(0.5)
             c.roundRect(qr_x - 2 * mm, qr_box_y - 2 * mm, qr_size + 4 * mm, qr_size + 8 * mm, 2, stroke=1, fill=0)
-            
+
             c.drawImage(qr_image, qr_x, qr_box_y + 4 * mm, width=qr_size, height=qr_size, preserveAspectRatio=True)
             c.setFillColor(TEXT_LIGHT)
             c.setFont("Helvetica", 6.5)
@@ -275,7 +306,7 @@ def build_receipt_pdf(booking):
     c.setStrokeColor(BORDER_GRAY)
     c.setLineWidth(0.5)
     c.line(15 * mm, 16 * mm, width - 15 * mm, 16 * mm)
-    
+
     # Footer text - clean, minimal
     c.setFillColor(TEXT_LIGHT)
     c.setFont("Helvetica-Oblique", 7)
