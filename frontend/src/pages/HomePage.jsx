@@ -5,23 +5,23 @@ import { getHostels, resolveMediaUrl, extractErrorMessages } from "../services/a
 const TESTIMONIALS = [
   {
     text:
-      "I booked my bed from home the day admissions opened and paid with M-Pesa in under two minutes. No queues at all.",
+      "I booked my hostel room from home immediately after admissions opened, and the entire process took less than five minutes. I was able to view the available rooms, choose the bed I wanted, and complete my payment securely through M-Pesa without visiting the accommodation office. Within seconds of the STK Push confirmation, I received my booking confirmation and digital receipt. It completely eliminated the stress of long queues and uncertainty during reporting day.",
     name: "Brian Kiptoo",
-    role: "First Year, Boys Hostel Block A",
+    role: "First Year Student • Boys Hostel Block A",
     image: "/assets/img/testimonial/test1.jpg",
   },
   {
     text:
-      "Seeing exactly which bed was free before paying gave me confidence I would not lose my money on a room that was already full.",
+      "What impressed me most was the transparency of the system. Before making any payment, I could see the available hostels, compare room options, and confirm that my preferred bed was still vacant in real time. After completing the M-Pesa payment, my reservation was confirmed instantly, and I received a receipt immediately. The platform is simple to use, reliable, and gives students confidence that every booking is genuine.",
     name: "Sharon Achieng",
-    role: "Second Year, Girls Hostel Block A",
+    role: "Second Year Student • Girls Hostel Block A",
     image: "/assets/img/testimonial/test2.jpg",
   },
   {
     text:
-      "My receipt with the QR code made check-in day so fast - the warden just scanned it and I was done.",
+      "The online hostel booking system made my reporting day incredibly smooth. Instead of carrying paperwork and waiting for manual verification, I simply presented my QR code receipt to the hostel warden, who scanned it and confirmed my booking within seconds. The entire check-in process was fast, organized, and hassle-free. This digital approach has made accommodation management much more efficient for both students and the university staff.",
     name: "Kevin Mutua",
-    role: "Third Year, Boys Hostel Block B",
+    role: "Third Year Student • Boys Hostel Block B",
     image: "/assets/img/testimonial/test3.jpg",
   },
 ];
