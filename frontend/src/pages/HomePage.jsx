@@ -735,151 +735,538 @@ export default function HomePage() {
               data-wow-delay="0.1s"
               data-wow-offset="0"
             >
-              <div className="our-team">
-                <div className="team-content">
-                  <a href="#">
-                    <img src="/assets/img/team/team1.jpg" alt="Hostel warden" />
-                  </a>
-                  <ul className="social-links">
+              <div className="our-team" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                border: '1px solid #ddd',
+                padding: '10px',
+                textAlign: 'center',
+                borderRadius: '8px',
+                background: '#fff',
+                transition: 'all 0.3s ease'
+              }}>
+                <div className="team-content" style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  flexShrink: 0
+                }}>
+                  <div style={{
+                    width: '100%',
+                    height: '320px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    background: '#f5f5f5'
+                  }}>
+                    <a href="#" style={{ display: 'block', width: '100%', height: '100%' }}>
+                      <img 
+                        src="/assets/img/team/team4.webp" 
+                        alt="Hostel warden" 
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'transform 0.3s ease'
+                        }}
+                      />
+                    </a>
+                  </div>
+                  <ul className="social-links" style={{
+                    padding: '0',
+                    margin: '0',
+                    listStyle: 'none',
+                    position: 'absolute',
+                    bottom: '0',
+                    left: '0',
+                    right: '0',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '5px',
+                    padding: '10px 0',
+                    background: 'linear-gradient(transparent, rgba(0,0,0,0.3))',
+                    opacity: '0',
+                    transition: 'opacity 0.3s ease'
+                  }}>
                     <li>
-                      <a href="#">
+                      <a href="#" style={{
+                        padding: '8px 12px',
+                        color: '#fff',
+                        display: 'block',
+                        background: '#525fe1',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s linear 0s'
+                      }}>
                         <i className="bi bi-telephone-fill"></i>
                       </a>
                     </li>
                     <li>
-                      <a href="#">
+                      <a href="#" style={{
+                        padding: '8px 12px',
+                        color: '#fff',
+                        display: 'block',
+                        background: '#525fe1',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s linear 0s'
+                      }}>
                         <i className="bi bi-envelope-fill"></i>
                       </a>
                     </li>
                   </ul>
                 </div>
-                <div className="team-prof">
-                  <h3>Mrs. Wanjiru Kamau</h3>
-                  <span>Warden, Boys Hostel Block A</span>
+                <div className="team-prof" style={{
+                  flex: '1',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  padding: '15px 0 5px'
+                }}>
+                  <h3 style={{
+                    fontWeight: '600',
+                    margin: '0 0 5px',
+                    fontSize: '18px',
+                    color: '#0b104a'
+                  }}>Mrs. Wanjiru Kamau</h3>
+                  <span style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    color: '#6c757d'
+                  }}>Warden, Boys Hostel Block A</span>
                 </div>
-                <div className="sth_det2">
-                  <span>
-                    <i className="bi bi-house-door me-1"></i> <u>Block A</u>
+                <div className="sth_det2" style={{
+                  flexShrink: 0,
+                  padding: '10px 0 5px'
+                }}>
+                  <span style={{
+                    color: '#525fe1',
+                    display: 'inline-block',
+                    margin: '5px 8px',
+                    fontSize: '14px'
+                  }}>
+                    <i className="bi bi-house-door me-1"></i> <u style={{
+                      color: '#1a2d62',
+                      textDecoration: 'none',
+                      fontWeight: '500'
+                    }}>Block A</u>
                   </span>
-                  <span>
-                    <i className="bi bi-person me-1"></i> <u>120 Students</u>
+                  <span style={{
+                    color: '#525fe1',
+                    display: 'inline-block',
+                    margin: '5px 8px',
+                    fontSize: '14px'
+                  }}>
+                    <i className="bi bi-person me-1"></i> <u style={{
+                      color: '#1a2d62',
+                      textDecoration: 'none',
+                      fontWeight: '500'
+                    }}>120 Students</u>
                   </span>
                 </div>
               </div>
             </div>
             {/* END COL */}
+            
             <div
               className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
               data-wow-duration="1s"
               data-wow-delay="0.1s"
               data-wow-offset="0"
             >
-              <div className="our-team">
-                <div className="team-content">
-                  <a href="#">
-                    <img src="/assets/img/team/team2.jpg" alt="Hostel warden" />
-                  </a>
-                  <ul className="social-links">
+              <div className="our-team" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                border: '1px solid #ddd',
+                padding: '10px',
+                textAlign: 'center',
+                borderRadius: '8px',
+                background: '#fff',
+                transition: 'all 0.3s ease'
+              }}>
+                <div className="team-content" style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  flexShrink: 0
+                }}>
+                  <div style={{
+                    width: '100%',
+                    height: '320px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    background: '#f5f5f5'
+                  }}>
+                    <a href="#" style={{ display: 'block', width: '100%', height: '100%' }}>
+                      <img 
+                        src="/assets/img/team/warden2.jpg" 
+                        alt="Hostel warden" 
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'transform 0.3s ease'
+                        }}
+                      />
+                    </a>
+                  </div>
+                  <ul className="social-links" style={{
+                    padding: '0',
+                    margin: '0',
+                    listStyle: 'none',
+                    position: 'absolute',
+                    bottom: '0',
+                    left: '0',
+                    right: '0',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '5px',
+                    padding: '10px 0',
+                    background: 'linear-gradient(transparent, rgba(0,0,0,0.3))',
+                    opacity: '0',
+                    transition: 'opacity 0.3s ease'
+                  }}>
                     <li>
-                      <a href="#">
+                      <a href="#" style={{
+                        padding: '8px 12px',
+                        color: '#fff',
+                        display: 'block',
+                        background: '#525fe1',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s linear 0s'
+                      }}>
                         <i className="bi bi-telephone-fill"></i>
                       </a>
                     </li>
                     <li>
-                      <a href="#">
+                      <a href="#" style={{
+                        padding: '8px 12px',
+                        color: '#fff',
+                        display: 'block',
+                        background: '#525fe1',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s linear 0s'
+                      }}>
                         <i className="bi bi-envelope-fill"></i>
                       </a>
                     </li>
                   </ul>
                 </div>
-                <div className="team-prof">
-                  <h3>Mr. Otieno Mwangi</h3>
-                  <span>Warden, Boys Hostel Block B</span>
+                <div className="team-prof" style={{
+                  flex: '1',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  padding: '15px 0 5px'
+                }}>
+                  <h3 style={{
+                    fontWeight: '600',
+                    margin: '0 0 5px',
+                    fontSize: '18px',
+                    color: '#0b104a'
+                  }}>Mr. Otieno Mwangi</h3>
+                  <span style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    color: '#6c757d'
+                  }}>Warden, Boys Hostel Block B</span>
                 </div>
-                <div className="sth_det2">
-                  <span>
-                    <i className="bi bi-house-door me-1"></i> <u>Block B</u>
+                <div className="sth_det2" style={{
+                  flexShrink: 0,
+                  padding: '10px 0 5px'
+                }}>
+                  <span style={{
+                    color: '#525fe1',
+                    display: 'inline-block',
+                    margin: '5px 8px',
+                    fontSize: '14px'
+                  }}>
+                    <i className="bi bi-house-door me-1"></i> <u style={{
+                      color: '#1a2d62',
+                      textDecoration: 'none',
+                      fontWeight: '500'
+                    }}>Block B</u>
                   </span>
-                  <span>
-                    <i className="bi bi-person me-1"></i> <u>96 Students</u>
+                  <span style={{
+                    color: '#525fe1',
+                    display: 'inline-block',
+                    margin: '5px 8px',
+                    fontSize: '14px'
+                  }}>
+                    <i className="bi bi-person me-1"></i> <u style={{
+                      color: '#1a2d62',
+                      textDecoration: 'none',
+                      fontWeight: '500'
+                    }}>96 Students</u>
                   </span>
                 </div>
               </div>
             </div>
             {/* END COL */}
+            
             <div
               className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
               data-wow-duration="1s"
               data-wow-delay="0.1s"
               data-wow-offset="0"
             >
-              <div className="our-team">
-                <div className="team-content">
-                  <a href="#">
-                    <img src="/assets/img/team/team3.jpg" alt="Hostel warden" />
-                  </a>
-                  <ul className="social-links">
+              <div className="our-team" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                border: '1px solid #ddd',
+                padding: '10px',
+                textAlign: 'center',
+                borderRadius: '8px',
+                background: '#fff',
+                transition: 'all 0.3s ease'
+              }}>
+                <div className="team-content" style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  flexShrink: 0
+                }}>
+                  <div style={{
+                    width: '100%',
+                    height: '320px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    background: '#f5f5f5'
+                  }}>
+                    <a href="#" style={{ display: 'block', width: '100%', height: '100%' }}>
+                      <img 
+                        src="/assets/img/team/warden3.jpg" 
+                        alt="Hostel warden" 
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'transform 0.3s ease'
+                        }}
+                      />
+                    </a>
+                  </div>
+                  <ul className="social-links" style={{
+                    padding: '0',
+                    margin: '0',
+                    listStyle: 'none',
+                    position: 'absolute',
+                    bottom: '0',
+                    left: '0',
+                    right: '0',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '5px',
+                    padding: '10px 0',
+                    background: 'linear-gradient(transparent, rgba(0,0,0,0.3))',
+                    opacity: '0',
+                    transition: 'opacity 0.3s ease'
+                  }}>
                     <li>
-                      <a href="#">
+                      <a href="#" style={{
+                        padding: '8px 12px',
+                        color: '#fff',
+                        display: 'block',
+                        background: '#525fe1',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s linear 0s'
+                      }}>
                         <i className="bi bi-telephone-fill"></i>
                       </a>
                     </li>
                     <li>
-                      <a href="#">
+                      <a href="#" style={{
+                        padding: '8px 12px',
+                        color: '#fff',
+                        display: 'block',
+                        background: '#525fe1',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s linear 0s'
+                      }}>
                         <i className="bi bi-envelope-fill"></i>
                       </a>
                     </li>
                   </ul>
                 </div>
-                <div className="team-prof">
-                  <h3>Mrs. Achieng Otieno</h3>
-                  <span>Warden, Girls Hostel Block A</span>
+                <div className="team-prof" style={{
+                  flex: '1',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  padding: '15px 0 5px'
+                }}>
+                  <h3 style={{
+                    fontWeight: '600',
+                    margin: '0 0 5px',
+                    fontSize: '18px',
+                    color: '#0b104a'
+                  }}>Mrs. Achieng Otieno</h3>
+                  <span style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    color: '#6c757d'
+                  }}>Warden, Girls Hostel Block A</span>
                 </div>
-                <div className="sth_det2">
-                  <span>
-                    <i className="bi bi-house-door me-1"></i> <u>Block A</u>
+                <div className="sth_det2" style={{
+                  flexShrink: 0,
+                  padding: '10px 0 5px'
+                }}>
+                  <span style={{
+                    color: '#525fe1',
+                    display: 'inline-block',
+                    margin: '5px 8px',
+                    fontSize: '14px'
+                  }}>
+                    <i className="bi bi-house-door me-1"></i> <u style={{
+                      color: '#1a2d62',
+                      textDecoration: 'none',
+                      fontWeight: '500'
+                    }}>Block A</u>
                   </span>
-                  <span>
-                    <i className="bi bi-person me-1"></i> <u>140 Students</u>
+                  <span style={{
+                    color: '#525fe1',
+                    display: 'inline-block',
+                    margin: '5px 8px',
+                    fontSize: '14px'
+                  }}>
+                    <i className="bi bi-person me-1"></i> <u style={{
+                      color: '#1a2d62',
+                      textDecoration: 'none',
+                      fontWeight: '500'
+                    }}>140 Students</u>
                   </span>
                 </div>
               </div>
             </div>
             {/* END COL */}
+            
             <div
               className="col-lg-3 col-sm-6 col-xs-12 wow fadeInUp"
               data-wow-duration="1s"
               data-wow-delay="0.1s"
               data-wow-offset="0"
             >
-              <div className="our-team">
-                <div className="team-content">
-                  <a href="#">
-                    <img src="/assets/img/team/team4.jpg" alt="Hostel warden" />
-                  </a>
-                  <ul className="social-links">
+              <div className="our-team" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                border: '1px solid #ddd',
+                padding: '10px',
+                textAlign: 'center',
+                borderRadius: '8px',
+                background: '#fff',
+                transition: 'all 0.3s ease'
+              }}>
+                <div className="team-content" style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  flexShrink: 0
+                }}>
+                  <div style={{
+                    width: '100%',
+                    height: '320px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    background: '#f5f5f5'
+                  }}>
+                    <a href="#" style={{ display: 'block', width: '100%', height: '100%' }}>
+                      <img 
+                        src="/assets/img/team/warden4.jpg" 
+                        alt="Hostel warden" 
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transition: 'transform 0.3s ease'
+                        }}
+                      />
+                    </a>
+                  </div>
+                  <ul className="social-links" style={{
+                    padding: '0',
+                    margin: '0',
+                    listStyle: 'none',
+                    position: 'absolute',
+                    bottom: '0',
+                    left: '0',
+                    right: '0',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '5px',
+                    padding: '10px 0',
+                    background: 'linear-gradient(transparent, rgba(0,0,0,0.3))',
+                    opacity: '0',
+                    transition: 'opacity 0.3s ease'
+                  }}>
                     <li>
-                      <a href="#">
+                      <a href="#" style={{
+                        padding: '8px 12px',
+                        color: '#fff',
+                        display: 'block',
+                        background: '#525fe1',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s linear 0s'
+                      }}>
                         <i className="bi bi-telephone-fill"></i>
                       </a>
                     </li>
                     <li>
-                      <a href="#">
+                      <a href="#" style={{
+                        padding: '8px 12px',
+                        color: '#fff',
+                        display: 'block',
+                        background: '#525fe1',
+                        borderRadius: '4px',
+                        transition: 'all 0.3s linear 0s'
+                      }}>
                         <i className="bi bi-envelope-fill"></i>
                       </a>
                     </li>
                   </ul>
                 </div>
-                <div className="team-prof">
-                  <h3>Ms. Faith Njeri</h3>
-                  <span>Warden, Girls Hostel Block B</span>
+                <div className="team-prof" style={{
+                  flex: '1',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  padding: '15px 0 5px'
+                }}>
+                  <h3 style={{
+                    fontWeight: '600',
+                    margin: '0 0 5px',
+                    fontSize: '18px',
+                    color: '#0b104a'
+                  }}>Ms. Faith Njeri</h3>
+                  <span style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    color: '#6c757d'
+                  }}>Warden, Girls Hostel Block B</span>
                 </div>
-                <div className="sth_det2">
-                  <span>
-                    <i className="bi bi-house-door me-1"></i> <u>Block B</u>
+                <div className="sth_det2" style={{
+                  flexShrink: 0,
+                  padding: '10px 0 5px'
+                }}>
+                  <span style={{
+                    color: '#525fe1',
+                    display: 'inline-block',
+                    margin: '5px 8px',
+                    fontSize: '14px'
+                  }}>
+                    <i className="bi bi-house-door me-1"></i> <u style={{
+                      color: '#1a2d62',
+                      textDecoration: 'none',
+                      fontWeight: '500'
+                    }}>Block B</u>
                   </span>
-                  <span>
-                    <i className="bi bi-person me-1"></i> <u>110 Students</u>
+                  <span style={{
+                    color: '#525fe1',
+                    display: 'inline-block',
+                    margin: '5px 8px',
+                    fontSize: '14px'
+                  }}>
+                    <i className="bi bi-person me-1"></i> <u style={{
+                      color: '#1a2d62',
+                      textDecoration: 'none',
+                      fontWeight: '500'
+                    }}>110 Students</u>
                   </span>
                 </div>
               </div>
@@ -1156,7 +1543,7 @@ export default function HomePage() {
               data-wow-offset="0"
             >
               <div className="single_blog">
-                <img src="/assets/img/blog/1.jpg" className="img-fluid" alt="Hostel announcement" />
+                <img src="/assets/img/blog/news1.jpg" className="img-fluid" alt="Hostel announcement" />
                 <div className="content_box">
                   <span>
                     Aug 1, 2026 | <a href="#">Booking</a>
@@ -1178,7 +1565,7 @@ export default function HomePage() {
               data-wow-offset="0"
             >
               <div className="single_blog">
-                <img src="/assets/img/blog/2.jpg" className="img-fluid" alt="Hostel announcement" />
+                <img src="/assets/img/blog/new2.jpg" className="img-fluid" alt="Hostel announcement" />
                 <div className="content_box">
                   <span>
                     Jul 20, 2026 | <a href="#">Payments</a>
@@ -1200,7 +1587,7 @@ export default function HomePage() {
               data-wow-offset="0"
             >
               <div className="single_blog">
-                <img src="/assets/img/blog/3.jpg" className="img-fluid" alt="Hostel announcement" />
+                <img src="/assets/img/blog/news3.jpg" className="img-fluid" alt="Hostel announcement" />
                 <div className="content_box">
                   <span>
                     Jul 5, 2026 | <a href="#">Notice</a>
