@@ -243,8 +243,15 @@ class MpesaCallbackView(APIView):
             # arrived. Don't double-send the receipt email in that case.
             if booking.status != Booking.STATUS_PAID:
                 booking.mark_paid(mpesa_receipt_number=transaction.mpesa_receipt_number)
-                generate_qr_code(booking)
-                send_receipt_email(booking)
+                # Receipt generation / emailing must never take down the
+                # callback response to Safaricom (they expect a fast 200
+                # regardless) - the booking is already correctly marked
+                # paid at this point either way.
+                try:
+                    generate_qr_code(booking)
+                    send_receipt_email(booking)
+                except Exception:
+                    logger.exception("Receipt generation/email failed for booking %s (payment still recorded)", booking.id)
         else:
             transaction.status = (
                 MpesaTransaction.STATUS_CANCELLED if str(result_code) == "1032" else MpesaTransaction.STATUS_FAILED
@@ -332,8 +339,17 @@ class BookingStatusView(APIView):
             transaction.save()
             if booking.status != Booking.STATUS_PAID:
                 booking.mark_paid(mpesa_receipt_number=None)
-                generate_qr_code(booking)
-                send_receipt_email(booking)
+                # Same reasoning as the callback path: the /status/ endpoint
+                # is polled every couple seconds by the frontend and must
+                # stay up. The booking is already correctly marked paid
+                # regardless of whether the receipt/email step succeeds.
+                try:
+                    generate_qr_code(booking)
+                    send_receipt_email(booking)
+                except Exception:
+                    logger.exception(
+                        "Receipt generation/email failed for booking %s (payment still recorded)", booking.id
+                    )
         else:
             transaction.status = (
                 MpesaTransaction.STATUS_CANCELLED if transaction.result_code == "1032" else MpesaTransaction.STATUS_FAILED

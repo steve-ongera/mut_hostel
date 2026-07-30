@@ -44,7 +44,10 @@ export default function ReceiptPage() {
     return (
       <section className="section-padding">
         <div className="container text-center">
-          <p>Loading receipt...</p>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-3">Loading receipt...</p>
         </div>
       </section>
     );
@@ -54,11 +57,12 @@ export default function ReceiptPage() {
     return (
       <section className="section-padding">
         <div className="container">
-          <div className="alert alert-danger">
-            <i className="ti-alert"></i> {error || "Booking not found"}
+          <div className="alert alert-danger d-flex align-items-center">
+            <i className="bi bi-exclamation-triangle-fill me-2"></i> 
+            {error || "Booking not found"}
           </div>
           <Link to="/hostels" className="btn_one">
-            Back to Hostels
+            <i className="bi bi-arrow-left me-2"></i> Back to Hostels
           </Link>
         </div>
       </section>
@@ -72,11 +76,11 @@ export default function ReceiptPage() {
           <div className="row">
             <div className="col-lg-8 offset-lg-2">
               <div className="single_course" style={{ padding: "40px", textAlign: "center" }}>
-                <i className="ti-alert" style={{ fontSize: "60px", color: "#f26b65" }}></i>
+                <i className="bi bi-exclamation-circle" style={{ fontSize: "60px", color: "#f26b65" }}></i>
                 <h3 style={{ marginTop: "20px" }}>Payment Not Confirmed</h3>
                 <p>This booking has not been paid yet. Please complete payment first.</p>
                 <Link to={`/booking/${id}/pay`} className="btn_one">
-                  Go to Payment
+                  <i className="bi bi-credit-card me-2"></i> Go to Payment
                 </Link>
               </div>
             </div>
@@ -95,9 +99,10 @@ export default function ReceiptPage() {
             <div className="col-lg-12">
               <div className="section-top-title">
                 <h1>Payment Receipt</h1>
-                <ul>
-                  <li><Link to="/">Home</Link> /</li>
-                  <li>Receipt</li>
+                <ul className="breadcrumb-list">
+                  <li><Link to="/">Home</Link></li>
+                  <li><Link to="/hostels">Hostels</Link></li>
+                  <li className="active">Receipt</li>
                 </ul>
               </div>
             </div>
@@ -113,7 +118,7 @@ export default function ReceiptPage() {
             <div className="col-lg-10 offset-lg-1">
               <div className="single_course" style={{ padding: "40px" }}>
                 <div style={{ textAlign: "center", marginBottom: "30px" }}>
-                  <i className="ti-check" style={{ fontSize: "60px", color: "#525fe1", background: "#ECEDFF", padding: "20px", borderRadius: "50%" }}></i>
+                  <i className="bi bi-check-circle-fill" style={{ fontSize: "60px", color: "#525fe1", background: "#ECEDFF", padding: "20px", borderRadius: "50%" }}></i>
                   <h2 style={{ marginTop: "20px", color: "#525fe1" }}>Payment Successful!</h2>
                   <p>Your booking has been confirmed. Show this receipt at check-in.</p>
                 </div>
@@ -159,11 +164,12 @@ export default function ReceiptPage() {
                     style={{
                       padding: "15px 40px",
                       opacity: downloading ? 0.7 : 1,
-                      cursor: downloading ? "not-allowed" : "pointer"
+                      cursor: downloading ? "not-allowed" : "pointer",
+                      
                     }}
                   >
                     {downloading ? "Downloading..." : "Download PDF Receipt"}
-                    <i className="ti-download"></i>
+                    <i className="bi bi-download ms-2"></i>
                   </button>
                   <Link 
                     to="/hostels" 
@@ -176,7 +182,7 @@ export default function ReceiptPage() {
                     }}
                   >
                     Browse More Hostels
-                    <i className="ti-arrow-right"></i>
+                    <i className="bi bi-arrow-right ms-2"></i>
                   </Link>
                 </div>
               </div>
