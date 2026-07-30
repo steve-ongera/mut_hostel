@@ -8,21 +8,21 @@ const TESTIMONIALS = [
       "I booked my bed from home the day admissions opened and paid with M-Pesa in under two minutes. No queues at all.",
     name: "Brian Kiptoo",
     role: "First Year, Boys Hostel Block A",
-    image: "/assets/img/testimonial/1.png",
+    image: "/assets/img/testimonial/test1.jpg",
   },
   {
     text:
       "Seeing exactly which bed was free before paying gave me confidence I would not lose my money on a room that was already full.",
     name: "Sharon Achieng",
     role: "Second Year, Girls Hostel Block A",
-    image: "/assets/img/testimonial/2.png",
+    image: "/assets/img/testimonial/test2.jpg",
   },
   {
     text:
       "My receipt with the QR code made check-in day so fast - the warden just scanned it and I was done.",
     name: "Kevin Mutua",
     role: "Third Year, Boys Hostel Block B",
-    image: "/assets/img/testimonial/3.png",
+    image: "/assets/img/testimonial/test3.jpg",
   },
 ];
 
@@ -1292,13 +1292,17 @@ export default function HomePage() {
               <div className="ab_content">
                 <h2>Why Students Choose Our Online Booking</h2>
                 <p>
-                  No more standing in line outside the accommodation office. Reserve your bed the
-                  moment admissions open and pay from anywhere.
+                  Experience a modern and hassle-free way to secure your university accommodation without visiting the accommodation office. Browse available hostels, compare room categories, view pricing, and reserve your preferred bed from anywhere using your smartphone, tablet, or computer. The platform is available 24/7, allowing students to complete the entire booking process at their own convenience, whether they are on campus or miles away.
                 </p>
+
                 <p>
-                  Every payment is reconciled automatically through M-Pesa Daraja, so your bed is
-                  confirmed the second your STK push succeeds.
+                  Our intelligent hostel management system updates room availability in real time, ensuring every booking reflects the latest occupancy status. Once a room is reserved, availability is immediately adjusted to prevent double bookings and eliminate manual allocation errors. This provides students with confidence that the room they select is genuinely available while enabling university administrators to manage accommodation efficiently throughout the admission and registration period.
                 </p>
+
+                <p>
+                  Payments are processed securely through M-Pesa Daraja integration, providing a seamless and trusted payment experience for students and parents. After completing the STK Push transaction, the system automatically verifies the payment, reconciles it with the reservation, and instantly confirms the booking without requiring manual verification. Digital receipts are generated immediately, giving students a complete record of every transaction while reducing administrative workload.
+                </p>
+
                 <ul>
                   <li>
                     <i className="bi bi-check-circle-fill"></i> A 10-minute hold protects your bed while you pay
@@ -1323,7 +1327,7 @@ export default function HomePage() {
               data-wow-offset="0"
             >
               <div className="ab_img">
-                <img src="/assets/img/about3.jpg" className="img-fluid" alt="Booking on a laptop" />
+                <img src="/assets/img/about3.jpeg" className="img-fluid" alt="Booking on a laptop" />
                 <div className="home_ps2">
                   <div className="icon-box">
                     <i className="bi bi-book"></i>
