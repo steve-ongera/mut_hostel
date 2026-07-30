@@ -16,6 +16,7 @@ import logging
 
 import requests
 from django.conf import settings
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +95,22 @@ class MpesaClient:
         self.passkey = settings.MPESA_PASSKEY
         self.callback_url = settings.MPESA_CALLBACK_URL
 
+    # Daraja tokens are valid ~3600s. We cache per (env, shortcode) so we
+    # only hit Safaricom's oauth endpoint roughly once an hour instead of
+    # on every single poll - repeatedly re-authenticating every 2-3 seconds
+    # is exactly the pattern that trips Incapsula's bot protection and gets
+    # the calling IP challenged/blocked for a cooldown period.
+    TOKEN_CACHE_TTL_BUFFER_SECONDS = 120  # refresh a bit before actual expiry
+
+    def _token_cache_key(self):
+        return f"mpesa_access_token:{self.env}:{self.shortcode}"
+
     def _get_access_token(self):
+        cache_key = self._token_cache_key()
+        cached_token = cache.get(cache_key)
+        if cached_token:
+            return cached_token
+
         url = f"{self.base_url}/oauth/v1/generate?grant_type=client_credentials"
         try:
             response = requests.get(
@@ -125,7 +141,13 @@ class MpesaClient:
                 status_code=response.status_code,
                 daraja_body=body,
             )
-        return body["access_token"]
+
+        token = body["access_token"]
+        expires_in = int(body.get("expires_in", 3599))
+        ttl = max(expires_in - self.TOKEN_CACHE_TTL_BUFFER_SECONDS, 60)
+        cache.set(cache_key, token, timeout=ttl)
+        logger.debug("Fetched new M-Pesa access token, caching for %ss", ttl)
+        return token
 
     def _password(self, timestamp):
         raw = f"{self.shortcode}{self.passkey}{timestamp}".encode("utf-8")
@@ -219,6 +241,14 @@ class MpesaClient:
 
         result_code = str(data.get("ResultCode"))
         result_desc = data.get("ResultDesc", "")
+
+        # Daraja's query endpoint uses ResultCode "4999" (undocumented but
+        # consistently observed) to mean "still being processed on the
+        # customer's phone" - a real code is present, it just isn't a
+        # final outcome yet. Treat it the same as the missing-ResultCode
+        # case above rather than as a failure.
+        if result_code == "4999":
+            return {"status": "pending", "result_code": result_code, "result_desc": result_desc}
 
         if result_code == "0":
             return {"status": "success", "result_code": result_code, "result_desc": result_desc}

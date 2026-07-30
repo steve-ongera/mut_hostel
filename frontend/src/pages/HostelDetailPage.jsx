@@ -202,7 +202,10 @@ export default function HostelDetailPage() {
                 background: "#fff",
                 borderRadius: "8px",
                 border: "1px solid #e8e8e9",
-                overflow: "hidden"
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                height: "100%"
               }}>
                 <h3 style={{ 
                   background: "#0b104a", 
@@ -210,12 +213,19 @@ export default function HostelDetailPage() {
                   padding: "15px 20px", 
                   fontSize: "18px",
                   fontWeight: "600",
-                  margin: 0
+                  margin: 0,
+                  flexShrink: 0
                 }}>
                   <i className="bi bi-bed me-2"></i> Select Your Bed
                 </h3>
                 
-                <div style={{ padding: "20px", maxHeight: "600px", overflowY: "auto" }}>
+                {/* Scrollable room list */}
+                <div style={{ 
+                  padding: "20px 20px 10px 20px", 
+                  flex: 1,
+                  overflowY: "auto",
+                  maxHeight: "400px"
+                }}>
                   {hostel.rooms && hostel.rooms.length > 0 ? (
                     hostel.rooms.map((room) => (
                       <div key={room.id} style={{ 
@@ -298,40 +308,63 @@ export default function HostelDetailPage() {
                       No rooms available
                     </p>
                   )}
+                </div>
 
+                {/* Fixed bottom section with selection status and book button */}
+                <div style={{ 
+                  padding: "15px 20px 20px 20px",
+                  borderTop: "1px solid #f0f0f0",
+                  background: "#fff",
+                  flexShrink: 0
+                }}>
                   {/* Selected Bed Confirmation */}
-                  {selectedBed && (
+                  {selectedBed ? (
                     <div style={{ 
                       background: "#f0fdf4", 
                       border: "1px solid #bbf7d0",
                       borderRadius: "6px",
                       padding: "10px 15px",
                       fontSize: "14px",
-                      marginTop: "10px",
+                      marginBottom: "12px",
                       display: "flex",
                       alignItems: "center"
                     }}>
                       <i className="bi bi-check-circle-fill me-2" style={{ color: "#22c55e" }}></i>
                       <span>Bed <strong>{selectedBed}</strong> selected</span>
                     </div>
+                  ) : (
+                    <div style={{ 
+                      background: "#f8f9fa", 
+                      border: "1px solid #e0e0e0",
+                      borderRadius: "6px",
+                      padding: "10px 15px",
+                      fontSize: "14px",
+                      marginBottom: "12px",
+                      display: "flex",
+                      alignItems: "center",
+                      color: "#6c757d"
+                    }}>
+                      <i className="bi bi-info-circle me-2"></i>
+                      <span>Please select a bed above</span>
+                    </div>
                   )}
 
-                  {/* Book Button */}
+                  {/* Book Button - Always visible */}
                   <button
                     onClick={handleBookBed}
                     disabled={!selectedBed}
                     className="btn_one"
                     style={{
                       width: "100%",
-                      marginTop: "20px",
+                      padding: "12px",
+                      fontSize: "16px",
                       opacity: selectedBed ? 1 : 0.5,
                       cursor: selectedBed ? "pointer" : "not-allowed",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       gap: "8px",
-                      padding: "12px",
-                      fontSize: "16px"
+                      transition: "all 0.3s ease"
                     }}
                   >
                     <i className="bi bi-calendar-check"></i>

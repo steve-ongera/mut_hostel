@@ -1,32 +1,101 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"></head>
-<body style="font-family: Arial, sans-serif; color:#222; max-width:600px; margin:0 auto;">
-  <div style="background:#9e0505; padding:20px; text-align:center;">
-    <h2 style="color:#fff; margin:0;">Murang'a University of Technology</h2>
-    <p style="color:#fff; margin:4px 0 0;">Hostel Booking Portal</p>
-  </div>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MUT Hostel Booking Receipt</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f5fb; font-family: Arial, Helvetica, sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5fb; padding: 30px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
 
-  <div style="padding:24px;">
-    <p>Dear {{ booking.full_name }},</p>
-    <p>
-      Your hostel booking payment has been received successfully. Below are your booking details.
-      Your official receipt, including a scannable QR code, is attached to this email as a PDF.
-    </p>
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#0b104a; padding: 24px 30px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="color:#ffffff; font-size:16px; font-weight:bold;">
+                    MURANG'A UNIVERSITY OF TECHNOLOGY
+                  </td>
+                </tr>
+                <tr>
+                  <td style="color:#d8dbff; font-size:12px; padding-top:4px;">
+                    Hostel Booking Payment Receipt
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr><td style="background-color:#525fe1; height:4px; line-height:4px; font-size:0;">&nbsp;</td></tr>
 
-    <table style="width:100%; border-collapse:collapse; margin:16px 0;">
-      <tr><td style="padding:6px 0; font-weight:bold;">Booking Reference</td><td>{{ booking.booking_reference }}</td></tr>
-      <tr><td style="padding:6px 0; font-weight:bold;">Registration No.</td><td>{{ booking.registration_number }}</td></tr>
-      <tr><td style="padding:6px 0; font-weight:bold;">Hostel</td><td>{{ booking.hostel.name }}</td></tr>
-      <tr><td style="padding:6px 0; font-weight:bold;">Room / Bed</td><td>{{ booking.room.room_number }} / {{ booking.bed.bed_number }}</td></tr>
-      <tr><td style="padding:6px 0; font-weight:bold;">Amount Paid</td><td>KES {{ booking.amount }}</td></tr>
-      <tr><td style="padding:6px 0; font-weight:bold;">Status</td><td>{{ booking.get_status_display }}</td></tr>
-    </table>
+          <!-- Body -->
+          <tr>
+            <td style="padding: 30px;">
+              <p style="font-size:15px; color:#1a1a2e; margin:0 0 16px 0;">
+                Dear {{ booking.full_name }},
+              </p>
+              <p style="font-size:14px; color:#333333; line-height:1.6; margin:0 0 20px 0;">
+                Your hostel booking payment has been confirmed. Your bed is now secured.
+                Please find your official receipt attached to this email as a PDF - keep it
+                safe and present it (or the QR code) at check-in.
+              </p>
 
-    <p>Please keep this receipt safe. You may be asked to present it (or the QR code) when reporting to your hostel.</p>
-    <p>If you have any questions, contact the Directorate of Catering and Accommodation Services.</p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                     style="background-color:#ECEDFF; border-radius:6px; padding: 4px 0;">
+                <tr>
+                  <td style="padding: 16px 20px;">
+                    <table role="presentation" width="100%" cellpadding="4" cellspacing="0" style="font-size:13px; color:#1a1a2e;">
+                      <tr>
+                        <td style="color:#6c757d; width:45%;">Booking Reference</td>
+                        <td style="font-weight:bold;">{{ booking.booking_reference }}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#6c757d;">Registration No.</td>
+                        <td>{{ booking.registration_number }}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#6c757d;">Hostel</td>
+                        <td>{{ booking.hostel.name }}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#6c757d;">Room / Bed</td>
+                        <td>{{ booking.room.room_number }} / {{ booking.bed.bed_number }}</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#6c757d;">Amount Paid</td>
+                        <td style="font-weight:bold; color:#0b104a;">KES {{ booking.amount }}</td>
+                      </tr>
+                      {% if booking.paid_at %}
+                      <tr>
+                        <td style="color:#6c757d;">Date Paid</td>
+                        <td>{{ booking.paid_at|date:"d M Y, H:i" }}</td>
+                      </tr>
+                      {% endif %}
+                    </table>
+                  </td>
+                </tr>
+              </table>
 
-    <p style="margin-top:24px;">Regards,<br>MUT Hostel Booking System</p>
-  </div>
+              <p style="font-size:13px; color:#6c757d; line-height:1.6; margin: 24px 0 0 0;">
+                If you have any questions about your booking, please contact the hostel office.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 18px 30px; border-top:1px solid #eeeeee;">
+              <p style="font-size:11px; color:#999999; margin:0; text-align:center;">
+                This is an automated message from the MUT Hostel Booking Portal. Please do not reply to this email.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>

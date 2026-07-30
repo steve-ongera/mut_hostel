@@ -27,7 +27,10 @@ logger = logging.getLogger(__name__)
 # Don't hammer Daraja on every 2-second frontend poll - only actively query
 # again if at least this many seconds have passed since we last touched the
 # transaction record (covers both the initial push and any prior query).
-ACTIVE_QUERY_MIN_INTERVAL_SECONDS = 3
+# Kept comfortably above the frontend's 2s poll interval - repeatedly
+# hitting Daraja's endpoints in quick succession is what trips Safaricom's
+# sandbox WAF (Incapsula) into rate-limiting/challenging the requesting IP.
+ACTIVE_QUERY_MIN_INTERVAL_SECONDS = 5
 
 
 class BedDetailView(APIView):
