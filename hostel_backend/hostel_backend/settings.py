@@ -1,4 +1,3 @@
-
 """
 Django settings for the MUT Hostel Booking Portal (hostel_backend project, api app).
 """
@@ -11,7 +10,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
  
 SECRET_KEY = config("DJANGO_SECRET_KEY", default="change-this-in-production")
 DEBUG = config("DEBUG", default=True, cast=bool)
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost", cast=Csv())
+
+# NOTE: Django checks the incoming request's Host header against this list
+# for EVERY request - including the M-Pesa callback Safaricom sends through
+# your ngrok tunnel. This is separate from CORS_ALLOWED_ORIGINS /
+# CSRF_TRUSTED_ORIGINS below (those govern browser requests; this governs
+# the Host header on any HTTP request, browser or server-to-server).
+# Whenever your ngrok URL changes (free ngrok URLs change on every restart),
+# update it here too, or set ALLOWED_HOSTS in your .env instead of relying
+# on this default.
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS",
+    default="127.0.0.1,localhost,6c89-102-222-145-174.ngrok-free.app",
+    cast=Csv(),
+)
  
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -112,7 +124,6 @@ CORS_ALLOWED_ORIGINS = config(
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
     default="http://localhost:5173,http://127.0.0.1:5173,https://6c89-102-222-145-174.ngrok-free.app",
-    
     cast=Csv(),
 )
  

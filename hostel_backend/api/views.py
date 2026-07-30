@@ -24,6 +24,11 @@ from .receipt_service import generate_qr_code, send_receipt_email, build_receipt
 
 logger = logging.getLogger(__name__)
 
+# Don't hammer Daraja on every 2-second frontend poll - only actively query
+# again if at least this many seconds have passed since we last touched the
+# transaction record (covers both the initial push and any prior query).
+ACTIVE_QUERY_MIN_INTERVAL_SECONDS = 3
+
 
 class BedDetailView(APIView):
     """
@@ -162,7 +167,10 @@ class InitiateSTKPushView(APIView):
                 "merchant_request_id": data.get("MerchantRequestID", ""),
                 "checkout_request_id": data.get("CheckoutRequestID", ""),
                 "status": MpesaTransaction.STATUS_PENDING,
+                "result_code": "",
                 "result_desc": data.get("CustomerMessage", ""),
+                "mpesa_receipt_number": "",
+                "transaction_date": "",
             },
         )
 
@@ -180,6 +188,11 @@ class MpesaCallbackView(APIView):
     POST /api/payments/mpesa/callback/
     Public endpoint that Safaricom Daraja calls once the STK push has been
     accepted, declined, or timed out on the customer's phone.
+
+    This is the passive path. BookingStatusView also actively polls Daraja
+    as a fallback in case this callback never arrives (tunnel down, stale
+    URL, etc.) - both paths converge on the same MpesaTransaction/Booking
+    update logic below, and both are safe to run more than once.
     """
 
     authentication_classes = []
@@ -208,6 +221,8 @@ class MpesaCallbackView(APIView):
         transaction.result_code = str(result_code)
         transaction.result_desc = result_desc
 
+        booking = transaction.booking
+
         if str(result_code) == "0":
             metadata_items = callback.get("CallbackMetadata", {}).get("Item", [])
             metadata = {item.get("Name"): item.get("Value") for item in metadata_items}
@@ -217,39 +232,109 @@ class MpesaCallbackView(APIView):
             transaction.transaction_date = str(metadata.get("TransactionDate", ""))
             transaction.save()
 
-            booking = transaction.booking
-            booking.mark_paid(mpesa_receipt_number=transaction.mpesa_receipt_number)
-
-            generate_qr_code(booking)
-            send_receipt_email(booking)
+            # Idempotent: the active-query fallback in BookingStatusView may
+            # have already marked this booking paid before this callback
+            # arrived. Don't double-send the receipt email in that case.
+            if booking.status != Booking.STATUS_PAID:
+                booking.mark_paid(mpesa_receipt_number=transaction.mpesa_receipt_number)
+                generate_qr_code(booking)
+                send_receipt_email(booking)
         else:
             transaction.status = (
                 MpesaTransaction.STATUS_CANCELLED if str(result_code) == "1032" else MpesaTransaction.STATUS_FAILED
             )
             transaction.save()
-
-            booking = transaction.booking
-            booking.status = Booking.STATUS_CANCELLED
-            booking.save(update_fields=["status", "updated_at"])
-            booking.bed.release()
+            # Deliberately NOT cancelling the booking or releasing the bed
+            # here. A failed/cancelled push (wrong PIN, insufficient funds,
+            # user cancelled, timeout) is common and recoverable - the
+            # student should be able to retry immediately from the same
+            # payment page while their hold is still active. The bed only
+            # gets released if the hold genuinely expires
+            # (Bed.release_if_expired), which is checked on every relevant
+            # request.
 
         return Response({"ResultCode": 0, "ResultDesc": "Accepted"})
 
 
 class BookingStatusView(APIView):
-    """GET /api/bookings/<id>/status/ - lightweight polling endpoint for the frontend."""
+    """
+    GET /api/bookings/<id>/status/ - polling endpoint used by the frontend
+    while waiting for M-Pesa confirmation.
+
+    In addition to reporting the current DB state, this actively queries
+    Daraja for the transaction outcome if it's still pending and the
+    passive callback hasn't updated it yet. This means the frontend gets a
+    result within a couple of poll cycles even if the callback never
+    reaches this server (e.g. ngrok tunnel down or URL stale) - instead of
+    polling forever.
+    """
 
     def get(self, request, pk):
         booking = get_object_or_404(Booking, pk=pk)
         booking.bed.release_if_expired()
+
+        transaction = getattr(booking, "mpesa_transaction", None)
+
+        if (
+            transaction
+            and transaction.status == MpesaTransaction.STATUS_PENDING
+            and transaction.checkout_request_id
+            and booking.status == Booking.STATUS_PENDING_PAYMENT
+            and (timezone.now() - transaction.updated_at).total_seconds() >= ACTIVE_QUERY_MIN_INTERVAL_SECONDS
+        ):
+            self._actively_check_mpesa(booking, transaction)
+            transaction.refresh_from_db()
+            booking.refresh_from_db()
+
         data = {
             "booking_status": booking.status,
             "bed_status": booking.bed.status,
         }
-        if hasattr(booking, "mpesa_transaction"):
-            data["mpesa_status"] = booking.mpesa_transaction.status
-            data["mpesa_result_desc"] = booking.mpesa_transaction.result_desc
+        if transaction:
+            data["mpesa_status"] = transaction.status
+            data["mpesa_result_desc"] = transaction.result_desc
         return Response(data)
+
+    def _actively_check_mpesa(self, booking, transaction):
+        try:
+            client = MpesaClient()
+            result = client.query_stk_status(transaction.checkout_request_id)
+        except MpesaError as exc:
+            logger.warning("Active M-Pesa status query failed for booking %s: %s", booking.id, exc)
+            return
+        except Exception:
+            # Belt-and-braces: whatever goes wrong here, the /status/
+            # endpoint the frontend polls every 2 seconds must never 500 -
+            # that would silently wedge the spinner since the frontend
+            # swallows polling errors and just keeps trying. Worst case we
+            # just fall back to waiting for the passive callback.
+            logger.exception("Unexpected error during active M-Pesa status check for booking %s", booking.id)
+            return
+
+        if result["status"] == "pending":
+            # Still being processed on the customer's phone - nothing to do,
+            # just touch updated_at so we don't re-query on the very next
+            # poll (throttling handled by ACTIVE_QUERY_MIN_INTERVAL_SECONDS).
+            transaction.save(update_fields=["updated_at"])
+            return
+
+        transaction.result_code = result["result_code"] or ""
+        transaction.result_desc = result["result_desc"]
+
+        if result["status"] == "success":
+            transaction.status = MpesaTransaction.STATUS_SUCCESS
+            transaction.save()
+            if booking.status != Booking.STATUS_PAID:
+                booking.mark_paid(mpesa_receipt_number=None)
+                generate_qr_code(booking)
+                send_receipt_email(booking)
+        else:
+            transaction.status = (
+                MpesaTransaction.STATUS_CANCELLED if transaction.result_code == "1032" else MpesaTransaction.STATUS_FAILED
+            )
+            transaction.save()
+            # Same as the callback path: don't cancel the booking or release
+            # the bed on a failed attempt, so the student can retry.
 
 
 class ReceiptDownloadView(APIView):
